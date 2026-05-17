@@ -11,7 +11,6 @@ export default function LoginPage() {
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
 
-        // Mock temporal hasta que el backend tenga JWT
         setAuth(
             { id: 1, email, name: 'Admin', surname: 'Meeple', birthdate: '', registerDate: '', roles: [] },
             'mock-token',

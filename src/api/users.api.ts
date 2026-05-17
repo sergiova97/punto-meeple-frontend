@@ -1,9 +1,9 @@
 import apiClient from './client'
-import type { User } from '../types'
+import type {PaginatedResponse, User} from '../types'
 
 export const usersApi = {
-    getAll: () =>
-        apiClient.get<User[]>('/users').then((r) => r.data),
+    getAll: (page: number = 1, limit: number = 10) =>
+        apiClient.get<PaginatedResponse<User>>('/users', { params: { page, limit } }).then((r) => r.data),
 
     getById: (id: number) =>
         apiClient.get<User>(`/users/${id}`).then((r) => r.data),

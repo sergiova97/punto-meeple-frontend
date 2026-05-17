@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { PrivateRoute } from './PrivateRoute'
 import {AppShell} from "../components/layout/AppShell.tsx";
 import LoginPage from "../pages/auth/LoginPage.tsx";
+import UsersPage from "../pages/auth/UsersPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -17,7 +18,7 @@ const router = createBrowserRouter([
                 children: [
                     { index: true, element: <Navigate to="/dashboard" replace /> },
                     { path: 'dashboard', element: <div>Dashboard</div> },
-                    { path: 'users', element: <div>Usuarios</div> },
+                    { path: 'users', element: <UsersPage /> },
                 ],
             }
         ]

@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
-import { usersApi } from '../../api/users.api'
+import { useEffect, useState } from 'react';
+import { usersApi } from '../../api/users.api';
 import { Table } from "../../components/ui/Table.tsx";
-import type { User } from '../../types'
+import type { User } from '../../types';
 import {Pagination} from "../../components/ui/Pagination.tsx";
+import {useNavigate} from "react-router-dom";
 
 const columns = [
     { label: 'Nombre', render: (user: User) => `${user.name} ${user.surname}` },
@@ -15,6 +16,7 @@ export default function UsersPage() {
     const [total, setTotal] = useState(0)
     const [page, setPage] = useState(1)
     const limit = 1
+    const navigate = useNavigate()
 
     useEffect(() => {
         usersApi.getAll(page, limit).then((res) => {
@@ -33,6 +35,7 @@ export default function UsersPage() {
                 columns={columns}
                 data={users}
                 keyExtractor={(user) => user.id}
+                onRowClick={(user) => navigate(`/users/${user.id}`)}
             />
 
             <Pagination

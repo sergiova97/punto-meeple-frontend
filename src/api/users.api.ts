@@ -1,5 +1,5 @@
-import apiClient from './client'
-import type {PaginatedResponse, User} from '../types'
+import apiClient from './client';
+import type {PaginatedResponse, User} from '../types';
 
 export const usersApi = {
     getAll: (page: number = 1, limit: number = 10) =>
@@ -34,4 +34,14 @@ export const usersApi = {
         roleIds: number[]
     }) =>
         apiClient.post('/users/assign-roles', data).then((r) => r.data),
+
+    uploadProfileImage: (id: number, file: File) => {
+        const formData = new FormData()
+        formData.append('file', file)
+        return apiClient
+            .post<{ profileImage: string }>(`/users/${id}/profile-image`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            })
+            .then((r) => r.data)
+    },
 }

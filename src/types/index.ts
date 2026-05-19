@@ -5,6 +5,7 @@ export interface User {
     surname: string
     birthdate: string
     registerDate: string
+    profileImage: string | null
     roles: Role[]
 }
 

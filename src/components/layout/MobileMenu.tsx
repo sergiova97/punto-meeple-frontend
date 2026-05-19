@@ -1,10 +1,15 @@
-import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faXmark, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { useState } from 'react';
+import {BottomBar} from "./BottomBar.tsx";
 import {NAV_SECTIONS} from "./navSections.ts";
 
-export function Sidebar() {
+interface MobileMenuProps {
+    onClose: () => void
+}
+
+export function MobileMenu({ onClose }: MobileMenuProps) {
     const [openSections, setOpenSections] = useState<string[]>(['Socios'])
 
     function toggleSection(label: string) {
@@ -16,34 +21,40 @@ export function Sidebar() {
     }
 
     return (
-        <aside
+        <div
             style={{
-                width: '260px',
-                height: '100vh',
-                background: '#ffffff',
-                borderRight: '1px solid #e5e7eb',
+                position: 'fixed',
+                inset: 0,
+                background: 'var(--bg-card)',
+                zIndex: 200,
                 display: 'flex',
                 flexDirection: 'column',
-                flexShrink: 0,
             }}
         >
+
             <div
                 style={{
                     padding: '16px',
                     borderBottom: '1px solid var(--border)',
                     display: 'flex',
-                    flexDirection: 'row',
                     alignItems: 'center',
-                    gap: '20px',
+                    justifyContent: 'space-between',
                 }}
             >
-                <img src="/logo.png" alt="Punto Meeple" style={{ width: '50px', height: '50px' }} />
-                <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text-primary)' }}>
-                    Punto Meeple
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <img src="/logo.png" alt="Punto Meeple" style={{ width: '32px', height: '32px' }} />
+                    <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text-primary)' }}>
+            Punto Meeple
+          </span>
+                </div>
+                <button
+                    onClick={onClose}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}
+                >
+                    <FontAwesomeIcon icon={faXmark} style={{ width: '20px', height: '20px' }} />
+                </button>
             </div>
 
-            {/* Nav */}
             <nav style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
                 {NAV_SECTIONS.map((section) => {
                     const isOpen = openSections.includes(section.label)
@@ -57,13 +68,13 @@ export function Sidebar() {
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'space-between',
-                                    padding: '10px 16px',
+                                    padding: '12px 16px',
                                     background: 'none',
                                     border: 'none',
                                     cursor: 'pointer',
                                     fontSize: '0.9rem',
                                     fontWeight: 600,
-                                    color: '#111827',
+                                    color: 'var(--text-primary)',
                                 }}
                             >
                 <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -79,12 +90,13 @@ export function Sidebar() {
                                         <NavLink
                                             key={child.to}
                                             to={child.to}
+                                            onClick={onClose}
                                             style={({ isActive }) => ({
                                                 display: 'block',
-                                                padding: '8px 16px',
+                                                padding: '10px 16px',
                                                 fontSize: '0.875rem',
-                                                color: isActive ? '#111827' : '#6b7280',
-                                                background: isActive ? '#f3f4f6' : 'none',
+                                                color: isActive ? 'var(--color-primary)' : 'var(--text-secondary)',
+                                                background: isActive ? 'var(--color-secondary)' : 'none',
                                                 borderRadius: '6px',
                                                 textDecoration: 'none',
                                                 fontWeight: isActive ? 500 : 400,
@@ -99,6 +111,8 @@ export function Sidebar() {
                     )
                 })}
             </nav>
-        </aside>
+
+            <BottomBar onOpenMenu={onClose} />
+        </div>
     )
 }

@@ -1,1 +1,56 @@
 @import "tailwindcss";
+
+:root {
+    /* Background */
+    --bg-app: #F8F9FA;
+    --bg-card: #FFFFFF;
+    --bg-sidebar: #FFFFFF;
+
+    /* Main */
+    --color-primary: #4F46E5;
+    --color-primary-hover: #4338CA;
+    --color-secondary: #EEF2FF;
+    --color-secondary-hover: #E0E7FF;
+    --color-tertiary: #6B7280;
+    --color-highlight: #F59E0B;
+
+    /* Texts */
+    --text-primary: #111827;
+    --text-secondary: #6B7280;
+    --text-inverse: #FFFFFF;
+
+    /* Borders */
+    --border: #E5E7EB;
+
+    /* Buttons */
+    --btn-primary-bg: #4F46E5;
+    --btn-primary-text: #FFFFFF;
+    --btn-primary-hover: #4338CA;
+    --btn-secondary-bg: #EEF2FF;
+    --btn-secondary-text: #4F46E5;
+    --btn-secondary-hover: #E0E7FF;
+    --btn-danger-bg: #EF4444;
+    --btn-danger-text: #FFFFFF;
+    --btn-danger-hover: #DC2626;
+    --btn-disabled-bg: #E5E7EB;
+    --btn-disabled-text: #9CA3AF;
+
+    /* States */
+    --color-success: #10B981;
+    --color-error: #EF4444;
+    --color-warning: #F59E0B;
+    --color-info: #3B82F6;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    font-family: system-ui, sans-serif;
+    font-size: 16px;
+}

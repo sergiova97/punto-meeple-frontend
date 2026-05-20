@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { User } from '../types'
+import { persist } from "zustand/middleware";
 
 interface AuthState {
     user: User | null
@@ -9,16 +10,23 @@ interface AuthState {
     clearAuth: () => void
 }
 
-export const useAuthStore = create<AuthState>()((set) => ({
-    user: null,
-    token: null,
-    isAuthenticated: false,
+export const useAuthStore = create<AuthState>()(
+    persist(
+        (set) => ({
+            user: null,
+            token: null,
+            isAuthenticated: false,
 
-    setAuth: (user, token) => {
-        set({ user, token, isAuthenticated: true })
-    },
+            setAuth: (user, token) => {
+                set({ user, token, isAuthenticated: true })
+            },
 
-    clearAuth: () => {
-        set({ user: null, token: null, isAuthenticated: false })
-    },
-}))
+            clearAuth: () => {
+                set({ user: null, token: null, isAuthenticated: false })
+            },
+        }),
+        {
+            name: 'pm_auth',
+        },
+    ),
+)

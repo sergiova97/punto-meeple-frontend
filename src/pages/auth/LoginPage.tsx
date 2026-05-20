@@ -12,7 +12,7 @@ export default function LoginPage() {
         e.preventDefault()
 
         setAuth(
-            { id: 1, email, name: 'Admin', surname: 'Meeple', birthdate: '', registerDate: '', profileImage: null, roles: [] },
+            { id: 1, email, name: 'Admin', surname: 'Meeple', birthdate: '', registerDate: '', profileImage: null, roles: [{id:1,name:'ADMINISTRADOR'}] },
             'mock-token',
         )
         navigate('/dashboard')

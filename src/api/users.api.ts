@@ -44,4 +44,7 @@ export const usersApi = {
             })
             .then((r) => r.data)
     },
+
+    deactivate: (id: number) =>
+        apiClient.patch<{ success: boolean }>(`/users/${id}/deactivate`).then((r) => r.data),
 }

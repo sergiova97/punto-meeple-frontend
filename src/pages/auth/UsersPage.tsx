@@ -20,7 +20,7 @@ export default function UsersPage() {
     const [total, setTotal] = useState(0)
     const [page, setPage] = useState(1)
     const [createOpen, setCreateOpen] = useState(false)
-    const limit = 1
+    const limit = 10
     const navigate = useNavigate()
     const user_auth = useAuthStore((state) => state.user)
 
@@ -40,13 +40,14 @@ export default function UsersPage() {
 
     return (
         <div>
-            <h1>Socios</h1>
-            {canCreate && (
-                <Button variant="primary" onClick={() => setCreateOpen(true)}>
-                    Nuevo socio
-                </Button>
-            )}
-
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                <h1>Socios</h1>
+                {canCreate && (
+                    <Button variant="primary" onClick={() => setCreateOpen(true)}>
+                        Nuevo socio
+                    </Button>
+                )}
+            </div>
             <Table
                 columns={columns}
                 data={users}

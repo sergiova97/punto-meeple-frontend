@@ -6,6 +6,7 @@ export interface User {
     birthdate: string
     registerDate: string
     profileImage: string | null
+    isActive: boolean
     roles: Role[]
 }
 

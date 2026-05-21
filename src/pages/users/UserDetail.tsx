@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import { usersApi } from '../../api/users.api';
 import type { User } from '../../types';
 import {config} from "../../config.ts";
@@ -13,11 +13,26 @@ export default function UserDetail() {
     const [user, setUser] = useState<User | null>(null)
     const [editOpen, setEditOpen] = useState(false)
     const [rolesOpen, setRolesOpen] = useState(false)
+    const [deleting, setDeleting] = useState(false)
+    const navigate = useNavigate()
+
     const user_auth = useAuthStore((state) => state.user)
     const canEdit =
         user_auth?.id === user?.id ||
         user_auth?.roles.some((r) => r.id.toString() === config.roleAdmin)
     const canEditRoles = user_auth?.roles.some((r) => r.id.toString() === config.roleAdmin)
+    const canDelete = user_auth?.roles.some((r) => r.id.toString() === config.roleAdmin)
+
+    async function handleDelete() {
+        if (!user || !window.confirm(`¿Seguro que quieres desactivar a ${user.name} ${user.surname}?`)) return
+        setDeleting(true)
+        try {
+            await usersApi.deactivate(user.id)
+            navigate('/users')
+        } finally {
+            setDeleting(false)
+        }
+    }
 
     useEffect(() => {
         if (id) {
@@ -115,6 +130,14 @@ export default function UserDetail() {
                     </div>
                 </div>
             </div>
+
+            {canDelete && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
+                    <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+                        {deleting ? 'Desactivando...' : 'Desactivar socio'}
+                    </Button>
+                </div>
+            )}
 
             <UserEditModal
                 user={user}

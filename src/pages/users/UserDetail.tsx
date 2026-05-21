@@ -5,17 +5,19 @@ import type { User } from '../../types';
 import {config} from "../../config.ts";
 import { useAuthStore } from '../../store/auth.store';
 import {Button} from "../../components/ui/Button.tsx";
-import {SocioEditModal} from "./UserEditModal.tsx";
-import {logger} from "../../utils/logger.ts";
+import {UserEditModal} from "./UserEditModal.tsx";
+import {UserRolesModal} from "./UserRolesModal.tsx";
 
 export default function UserDetail() {
     const { id } = useParams()
     const [user, setUser] = useState<User | null>(null)
     const [editOpen, setEditOpen] = useState(false)
+    const [rolesOpen, setRolesOpen] = useState(false)
     const user_auth = useAuthStore((state) => state.user)
     const canEdit =
         user_auth?.id === user?.id ||
         user_auth?.roles.some((r) => r.id.toString() === config.roleAdmin)
+    const canEditRoles = user_auth?.roles.some((r) => r.id.toString() === config.roleAdmin)
 
     useEffect(() => {
         if (id) {
@@ -27,13 +29,21 @@ export default function UserDetail() {
 
     return (
         <div>
-            <h1 style={{ marginBottom: '24px' }}>{user.name} {user.surname}</h1>
-            {canEdit && (
-                <Button variant="primary" onClick={() => setEditOpen(true)}>
-                    Editar perfil
-                </Button>
-            )}
-
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                <h1>{user.name} {user.surname}</h1>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                    {canEditRoles && (
+                        <Button variant="primary" onClick={() => setRolesOpen(true)}>
+                            Asignar roles
+                        </Button>
+                    )}
+                    {canEdit && (
+                        <Button variant="primary" onClick={() => setEditOpen(true)}>
+                            Editar perfil
+                        </Button>
+                    )}
+                </div>
+            </div>
             <div style={{
                 display: 'flex',
                 flexWrap: 'wrap',
@@ -106,12 +116,19 @@ export default function UserDetail() {
                 </div>
             </div>
 
-            <SocioEditModal
+            <UserEditModal
                 user={user}
                 open={editOpen}
                 onClose={() => setEditOpen(false)}
                 onSave={(updated) => setUser((prev) => prev ?
                     { ...updated, roles: prev.roles, profileImage: prev.profileImage} : prev)}
+            />
+
+            <UserRolesModal
+                user={user}
+                open={rolesOpen}
+                onClose={() => setRolesOpen(false)}
+                onSave={(updated) => setUser(updated)}
             />
         </div>
     )

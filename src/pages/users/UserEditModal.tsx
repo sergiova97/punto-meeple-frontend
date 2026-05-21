@@ -11,7 +11,7 @@ interface SocioEditModalProps {
     onSave: (updated: User) => void
 }
 
-export function SocioEditModal({ user, open, onClose, onSave }: SocioEditModalProps) {
+export function UserEditModal({ user, open, onClose, onSave }: SocioEditModalProps) {
     const [name, setName] = useState(user.name)
     const [surname, setSurname] = useState(user.surname)
     const [email, setEmail] = useState(user.email)

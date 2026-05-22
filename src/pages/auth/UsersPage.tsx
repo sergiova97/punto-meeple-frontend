@@ -37,7 +37,7 @@ export default function UsersPage() {
     }, [page])
 
     const totalPages = Math.ceil(total / limit)
-
+console.log(user_auth)
     return (
         <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>

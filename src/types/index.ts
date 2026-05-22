@@ -15,6 +15,24 @@ export interface Role {
     name: string
 }
 
+export interface LoginDto {
+    email: string
+    password: string
+}
+
+export interface AuthUser {
+    id: number
+    email: string
+    name: string
+    surname: string
+    roles: Role[]
+}
+
+export interface AuthResponse {
+    access_token: string
+    user: AuthUser
+}
+
 export type MembershipFeeStatus = 'PENDING' | 'PAID' | 'OVERDUE'
 
 export type PaymentMethod = 'TRANSFER'

@@ -1,20 +1,30 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/auth.store'
+import {authApi} from "../../api/auth.api.ts";
 
 export default function LoginPage() {
     const navigate = useNavigate()
     const setAuth = useAuthStore((state) => state.setAuth)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
 
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
+        setError('')
+        setLoading(true)
 
-        setAuth(
-            { id: 1, email, name: 'Admin', surname: 'Meeple', birthdate: '', registerDate: '', profileImage: null, roles: [{id:1,name:'ADMINISTRADOR'}] },
-            'mock-token',
-        )
+        try {
+            const { access_token, user } = await authApi.login({ email, password })
+            setAuth(user, access_token)
+            navigate('/dashboard')
+        } catch {
+            setError('Email o contraseña incorrectos')
+        } finally {
+            setLoading(false)
+        }
         navigate('/dashboard')
     }
 
@@ -33,7 +43,10 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
             />
-            <button type="submit">Entrar</button>
+            {error && <p style={{ color: 'var(--color-error)' }}>{error}</p>}
+            <button type="submit" disabled={loading}>
+                {loading ? 'Entrando...' : 'Entrar'}
+            </button>
         </form>
     )
 }

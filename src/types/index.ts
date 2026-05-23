@@ -120,3 +120,27 @@ export interface LoanDto {
     returnDate: string | null
     status: LoanStatus
 }
+
+export type EventStatus = 'OPEN' | 'FULL' | 'CANCELLED' | 'FINISHED'
+
+export interface EventParticipant {
+    id: number
+    name: string
+    surname: string
+}
+
+export interface EventDto {
+    id: number
+    title: string
+    gameId: number | null
+    gameName: string | null
+    minPlayers: number
+    maxPlayers: number
+    dateTime: string
+    description: string | null
+    status: EventStatus
+    creatorId: number
+    creatorName: string
+    participants: EventParticipant[]
+    participantCount: number
+}

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Modal } from '../ui/Modal'
-import { Button } from '../ui/Button'
-import { usersApi } from '../../api/users.api'
-import { membershipFeesApi } from '../../api/membership-fees.api'
+import { Modal } from '../../components/ui/Modal.tsx'
+import { Button } from '../../components/ui/Button.tsx'
+import { usersApi } from '../../api/users.api.ts'
+import { membershipFeesApi } from '../../api/membership-fees.api.ts'
 import type { User } from '../../types'
 
 interface GenerateFeesModalProps {

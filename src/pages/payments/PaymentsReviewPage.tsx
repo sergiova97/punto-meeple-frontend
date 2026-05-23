@@ -115,10 +115,6 @@ export default function PaymentsReviewPage() {
 
     return (
         <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-                <h1>Revisión de pagos</h1>
-            </div>
-
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '16px' }}>
                 <input
                     style={inputStyle}

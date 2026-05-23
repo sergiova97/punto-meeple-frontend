@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { membershipFeesApi } from '../../api/membership-fees.api'
+import { membershipFeesApi } from '../../api/membership-fees.api.ts'
 import { FeeTable } from './FeeTable.tsx'
 import { FeeDetailModal } from './FeeDetailModal.tsx'
-import { PaymentModal } from './PaymentModal.tsx'
+import { PaymentModal } from '../payments/PaymentModal.tsx'
 import type { MembershipFeeDto, MembershipFeeStatus } from '../../types'
-import {Button} from "../ui/Button.tsx";
+import {Button} from "../../components/ui/Button.tsx";
 import {GenerateFeesModal} from "./GenerateFeesModal.tsx";
 
 export default function FeesPage() {
@@ -59,7 +59,6 @@ export default function FeesPage() {
     return (
         <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-                <h1>Cuotas</h1>
                 <Button variant="primary" onClick={() => setGenerateOpen(true)}>
                     Generar cuotas
                 </Button>

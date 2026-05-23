@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Modal } from '../ui/Modal'
-import { Button } from '../ui/Button'
-import { Badge } from '../ui/Badge'
-import { PaymentModal } from './PaymentModal'
+import { Modal } from '../../components/ui/Modal.tsx'
+import { Button } from '../../components/ui/Button.tsx'
+import { Badge } from '../../components/ui/Badge.tsx'
+import { PaymentModal } from '../payments/PaymentModal.tsx'
 import type { MembershipFeeDto, MembershipFeeStatus } from '../../types'
 
 interface FeeDetailModalProps {

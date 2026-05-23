@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { membershipFeesApi } from '../../api/membership-fees.api'
+import { membershipFeesApi } from '../../api/membership-fees.api.ts'
 import { FeeTable } from './FeeTable.tsx'
 import { FeeDetailModal } from './FeeDetailModal.tsx'
-import { PaymentModal } from './PaymentModal.tsx'
-import { useAuthStore } from '../../store/auth.store'
+import { PaymentModal } from '../payments/PaymentModal.tsx'
+import { useAuthStore } from '../../store/auth.store.ts'
 import type { MembershipFeeDto } from '../../types'
 
 export default function MyFeesPage() {
@@ -50,10 +50,6 @@ export default function MyFeesPage() {
 
     return (
         <div>
-            <div style={{ marginBottom: '24px' }}>
-                <h1>Mis cuotas</h1>
-            </div>
-
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '16px' }}>
                 <input
                     style={inputStyle}

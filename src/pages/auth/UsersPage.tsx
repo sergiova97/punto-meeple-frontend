@@ -41,7 +41,6 @@ console.log(user_auth)
     return (
         <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-                <h1>Socios</h1>
                 {canCreate && (
                     <Button variant="primary" onClick={() => setCreateOpen(true)}>
                         Nuevo socio

@@ -5,8 +5,8 @@ import type { User } from '../../types';
 import {config} from "../../config.ts";
 import { useAuthStore } from '../../store/auth.store';
 import {Button} from "../../components/ui/Button.tsx";
-import {UserEditModal} from "./UserEditModal.tsx";
-import {UserRolesModal} from "./UserRolesModal.tsx";
+import {UserEditModal} from "../../components/users/UserEditModal.tsx";
+import {UserRolesModal} from "../../components/users/UserRolesModal.tsx";
 
 export default function UserDetail() {
     const { id } = useParams()

@@ -2,8 +2,8 @@ import type {Role, User} from "../../types";
 import {useEffect, useState} from "react";
 import {rolesApi} from "../../api/roles.api.ts";
 import {usersApi} from "../../api/users.api.ts";
-import {Modal} from "../../components/ui/Modal.tsx";
-import {Button} from "../../components/ui/Button.tsx";
+import {Modal} from "../ui/Modal.tsx";
+import {Button} from "../ui/Button.tsx";
 
 interface UserRolesModalProps {
     user: User,

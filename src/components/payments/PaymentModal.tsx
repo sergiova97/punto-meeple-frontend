@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Modal } from '../../components/ui/Modal.tsx'
-import { Button } from '../../components/ui/Button.tsx'
+import { Modal } from '../ui/Modal.tsx'
+import { Button } from '../ui/Button.tsx'
 import { paymentsApi } from '../../api/payments.api.ts'
 import type {MembershipFeeDto} from "../../types";
 

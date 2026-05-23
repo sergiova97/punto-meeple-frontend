@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Modal } from '../../components/ui/Modal';
-import { Button } from '../../components/ui/Button';
-import { usersApi } from '../../api/users.api';
+import { Modal } from '../ui/Modal.tsx';
+import { Button } from '../ui/Button.tsx';
+import { usersApi } from '../../api/users.api.ts';
 import type { User } from '../../types';
 
 interface SocioEditModalProps {

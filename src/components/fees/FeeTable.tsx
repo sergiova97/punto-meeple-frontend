@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react'
-import { Table } from '../../components/ui/Table.tsx'
-import { Pagination } from '../../components/ui/Pagination.tsx'
-import { Badge } from '../../components/ui/Badge.tsx'
+import { Table } from '../ui/Table.tsx'
+import { Pagination } from '../ui/Pagination.tsx'
+import { Badge } from '../ui/Badge.tsx'
 import type { MembershipFeeDto, MembershipFeeStatus } from '../../types'
 
 interface FeeTableProps {

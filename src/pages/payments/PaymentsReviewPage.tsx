@@ -6,7 +6,7 @@ import { Badge } from '../../components/ui/Badge'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons'
 import type { PaymentDto } from '../../types'
-import {PaymentDetailModal} from "./PaymentDetalModal.tsx"
+import {PaymentDetailModal} from "../../components/payments/PaymentDetalModal.tsx"
 
 const STATUS_BADGE: Record<string, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'neutral' }> = {
     IN_REVIEW: { label: 'En revisión', variant: 'info' },

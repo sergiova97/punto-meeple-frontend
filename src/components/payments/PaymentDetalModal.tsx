@@ -1,7 +1,7 @@
-import { Modal } from '../../components/ui/Modal'
-import { Button } from '../../components/ui/Button'
-import { Badge } from '../../components/ui/Badge'
-import { paymentsApi } from '../../api/payments.api'
+import { Modal } from '../ui/Modal.tsx'
+import { Button } from '../ui/Button.tsx'
+import { Badge } from '../ui/Badge.tsx'
+import { paymentsApi } from '../../api/payments.api.ts'
 import type { PaymentDto } from '../../types'
 
 interface PaymentDetailModalProps {

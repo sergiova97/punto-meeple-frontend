@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { membershipFeesApi } from '../../api/membership-fees.api.ts'
-import { FeeTable } from './FeeTable.tsx'
-import { FeeDetailModal } from './FeeDetailModal.tsx'
-import { PaymentModal } from '../payments/PaymentModal.tsx'
+import { FeeTable } from '../../components/fees/FeeTable.tsx'
+import { FeeDetailModal } from '../../components/fees/FeeDetailModal.tsx'
+import { PaymentModal } from '../../components/payments/PaymentModal.tsx'
 import { useAuthStore } from '../../store/auth.store.ts'
 import type { MembershipFeeDto } from '../../types'
 import {Button} from "../../components/ui/Button.tsx";

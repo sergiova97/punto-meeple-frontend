@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { usersApi } from '../../api/users.api';
+import { usersApi } from '../../api/users.api.ts';
 import { Table } from "../../components/ui/Table.tsx";
 import type { User } from '../../types';
 import {Pagination} from "../../components/ui/Pagination.tsx";
@@ -7,7 +7,7 @@ import {useNavigate} from "react-router-dom";
 import {useAuthStore} from "../../store/auth.store.ts";
 import {config} from "../../config.ts";
 import {Button} from "../../components/ui/Button.tsx";
-import {UserCreateModal} from "../users/UserCreateModal.tsx";
+import {UserCreateModal} from "../../components/users/UserCreateModal.tsx";
 
 const columns = [
     { label: 'Nombre', render: (user: User) => `${user.name} ${user.surname}` },

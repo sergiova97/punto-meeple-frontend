@@ -10,6 +10,7 @@ import {config} from "../config.ts";
 import PaymentsReviewPage from "../pages/payments/PaymentsReviewPage.tsx";
 import BoardGamesPage from "../pages/games/BoardGamesPage.tsx";
 import RpgBooksPage from "../pages/games/RpgBooksPage.tsx";
+import GameSettingsPage from "../pages/games/GameSettingsPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -43,6 +44,13 @@ const router = createBrowserRouter([
                     },
                     { path: 'board-games', element: <BoardGamesPage /> },
                     { path: 'rpg-books', element: <RpgBooksPage /> },
+                    {
+                        path: 'game-settings',
+                        element: <PrivateRoute roles={[config.roleAdmin, config.roleLibrarian]} />,
+                        children: [
+                            { index: true, element: <GameSettingsPage /> },
+                        ],
+                    },
                 ],
             }
         ]

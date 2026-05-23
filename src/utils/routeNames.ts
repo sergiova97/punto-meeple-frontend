@@ -6,6 +6,7 @@ export const ROUTE_NAMES: Record<string, string> = {
     '/payments':    'Revisión de pagos',
     '/board-games': 'Juegos de mesa',
     '/rpg-books':   'Libros de rol',
+    '/game-settings': 'Categorías y mecánicas',
 }
 
 export function getRouteName(pathname: string): string {

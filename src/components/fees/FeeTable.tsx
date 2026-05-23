@@ -1,0 +1,88 @@
+import { useState } from 'react'
+import { Table } from '../ui/Table'
+import { Pagination } from '../ui/Pagination'
+import { Badge } from '../ui/Badge'
+import { Button } from '../ui/Button'
+import type { MembershipFeeDto, MembershipFeeStatus } from '../../types'
+
+interface FeeTableProps {
+    fees: MembershipFeeDto[]
+    total: number
+    page: number
+    onPageChange: (page: number) => void
+    onRowClick: (fee: MembershipFeeDto) => void
+    onPay?: (ids: number[]) => void
+    showUserColumn?: boolean
+}
+
+const STATUS_BADGE: Record<MembershipFeeStatus, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'neutral' }> = {
+    PAID:      { label: 'Pagada',      variant: 'success' },
+    PENDING:   { label: 'Pendiente',   variant: 'warning' },
+    OVERDUE:   { label: 'Vencida',     variant: 'danger' },
+    IN_REVIEW: { label: 'En revisión', variant: 'info' },
+}
+
+const PAYABLE_STATUSES: MembershipFeeStatus[] = ['PENDING', 'OVERDUE']
+
+export function FeeTable({ fees, total, page, onPageChange, onRowClick, onPay, showUserColumn = false }: FeeTableProps) {
+    const [selectedIds, setSelectedIds] = useState<number[]>([])
+    const limit = 10
+    const totalPages = Math.ceil(total / limit)
+
+    function toggleSelect(id: number, status: MembershipFeeStatus) {
+        if (!PAYABLE_STATUSES.includes(status)) return
+        setSelectedIds((prev) =>
+            prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
+        )
+    }
+
+    const columns = [
+        {
+            label: '',
+            render: (fee: MembershipFeeDto) => (
+                <input
+                    type="checkbox"
+                    checked={selectedIds.includes(fee.id)}
+                    disabled={!PAYABLE_STATUSES.includes(fee.status)}
+                    onChange={() => toggleSelect(fee.id, fee.status)}
+                    onClick={(e) => e.stopPropagation()}
+                />
+            ),
+        },
+        ...(showUserColumn ? [{ label: 'Socio', render: (fee: MembershipFeeDto) => fee.userName }] : []),
+        { label: 'Periodo', render: (fee: MembershipFeeDto) => fee.period },
+        { label: 'Precio', render: (fee: MembershipFeeDto) => `${fee.price} €` },
+        {
+            label: 'Estado',
+            render: (fee: MembershipFeeDto) => {
+                const { label, variant } = STATUS_BADGE[fee.status]
+                return <Badge variant={variant}>{label}</Badge>
+            },
+        },
+    ]
+
+    return (
+        <div>
+            {onPay && selectedIds.length > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+                    <Button variant="primary" onClick={() => onPay(selectedIds)}>
+                        Pagar seleccionadas ({selectedIds.length})
+                    </Button>
+                </div>
+            )}
+
+            <Table
+                columns={columns}
+                data={fees}
+                keyExtractor={(fee) => fee.id}
+                onRowClick={onRowClick}
+            />
+
+            <Pagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+            />
+        </div>
+    )
+}

@@ -33,7 +33,7 @@ export interface AuthResponse {
     user: AuthUser
 }
 
-export type MembershipFeeStatus = 'PENDING' | 'PAID' | 'OVERDUE'
+export type MembershipFeeStatus = 'PENDING' | 'PAID' | 'OVERDUE' | 'IN_REVIEW'
 
 export type PaymentMethod = 'TRANSFER'
 
@@ -51,6 +51,15 @@ export interface MembershipFee {
     price: number
     status: MembershipFeeStatus
     payment: Payment | null
+}
+
+export interface MembershipFeeDto {
+    id: number
+    userId: number
+    userName: string
+    period: string
+    price: number
+    status: MembershipFeeStatus
 }
 
 export interface PaginatedResponse<T> {

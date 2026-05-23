@@ -1,4 +1,4 @@
-import { faUsers } from '@fortawesome/free-solid-svg-icons';
+import {faMoneyBill, faUsers} from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 export interface NavSection {
@@ -13,7 +13,14 @@ export const NAV_SECTIONS: NavSection[] = [
         icon: faUsers,
         children: [
             { label: 'Listado general', to: '/users' },
-            { label: 'Cuotas', to: '/membership-fees' },
+        ],
+    },
+    {
+        label: 'Cuotas',
+        icon: faMoneyBill,
+        children: [
+            { label: 'Mis cuotas', to: '/my-fees' },
+            { label: 'Todas las cuotas', to: '/fees' },
         ],
     },
 ]

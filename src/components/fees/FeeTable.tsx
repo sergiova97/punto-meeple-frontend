@@ -36,6 +36,10 @@ export function FeeTable({ fees, total, page, onPageChange, onRowClick, onSelect
         onSelectionChange?.(selectedIds)
     }, [selectedIds])
 
+    useEffect(() => {
+        setSelectedIds([])
+    }, [resetSelection])
+
     function toggleSelect(id: number, status: MembershipFeeStatus) {
         if (!PAYABLE_STATUSES.includes(status)) return
         setSelectedIds((prev) =>

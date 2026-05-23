@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/Button'
 import { useAuthStore } from '../../store/auth.store'
 import type { Game } from '../../types'
 import {config} from "../../config.ts";
+import {GameDetailModal} from "../../components/games/GameDetailModal.tsx";
 
 export default function BoardGamesPage() {
     const [games, setGames] = useState<Game[]>([])
@@ -81,6 +82,13 @@ export default function BoardGamesPage() {
                 page={page}
                 totalPages={Math.ceil(total / limit)}
                 onPageChange={setPage}
+            />
+
+            <GameDetailModal
+                game={selectedGame}
+                open={detailOpen}
+                onClose={() => setDetailOpen(false)}
+                onEdit={() => { setDetailOpen(false) }}
             />
         </div>
     )

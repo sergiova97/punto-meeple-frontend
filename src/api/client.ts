@@ -29,7 +29,7 @@ apiClient.interceptors.response.use(
         const method = error.config?.method?.toUpperCase()
         console.log('Interceptor ejecutado:', method, url, status)
 
-        if (status === 401) {
+        if (status === 401 && window.location.pathname !== '/login') {
             localStorage.removeItem('pm_token')
             window.location.href = '/login'
         }

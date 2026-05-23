@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
 import { Table } from '../ui/Table'
 import { Pagination } from '../ui/Pagination'
 import { Badge } from '../ui/Badge'
@@ -14,6 +14,7 @@ interface FeeTableProps {
     onPay?: (ids: number[]) => void
     showUserColumn?: boolean
     showSelectAll?: boolean
+    resetSelection?: boolean
 }
 
 const STATUS_BADGE: Record<MembershipFeeStatus, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'neutral' }> = {
@@ -25,12 +26,16 @@ const STATUS_BADGE: Record<MembershipFeeStatus, { label: string; variant: 'succe
 
 const PAYABLE_STATUSES: MembershipFeeStatus[] = ['PENDING', 'OVERDUE']
 
-export function FeeTable({ fees, total, page, onPageChange, onRowClick, onPay, showUserColumn = false, showSelectAll = false }: FeeTableProps) {
+export function FeeTable({ fees, total, page, onPageChange, onRowClick, onPay, showUserColumn = false, showSelectAll = false, resetSelection = false }: FeeTableProps) {
     const [selectedIds, setSelectedIds] = useState<number[]>([])
     const limit = 10
     const totalPages = Math.ceil(total / limit)
     const payableFees = fees.filter((f) => PAYABLE_STATUSES.includes(f.status))
     const allPayableSelected = payableFees.length > 0 && payableFees.every((f) => selectedIds.includes(f.id))
+
+    useEffect(() => {
+        setSelectedIds([])
+    }, [resetSelection])
 
     function toggleSelect(id: number, status: MembershipFeeStatus) {
         if (!PAYABLE_STATUSES.includes(status)) return

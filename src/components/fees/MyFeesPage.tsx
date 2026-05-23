@@ -14,6 +14,7 @@ export default function MyFeesPage() {
     const [detailOpen, setDetailOpen] = useState(false)
     const [paymentOpen, setPaymentOpen] = useState(false)
     const [paymentFees, setPaymentFees] = useState<number[]>([])
+    const [resetSelection, setResetSelection] = useState(false)
 
     const [filterStatus, setFilterStatus] = useState('')
     const [filterPeriod, setFilterPeriod] = useState('')
@@ -86,6 +87,7 @@ export default function MyFeesPage() {
                     setPaymentFees(selected)
                     setPaymentOpen(true)
                 }}
+                resetSelection={resetSelection}
             />
 
             <FeeDetailModal
@@ -100,7 +102,7 @@ export default function MyFeesPage() {
                 open={paymentOpen}
                 onClose={() => setPaymentOpen(false)}
                 fees={paymentFees}
-                onSuccess={() => { setPaymentOpen(false); loadFees() }}
+                onSuccess={() => { setPaymentOpen(false); setResetSelection((prev) => !prev); loadFees() }}
             />
         </div>
     )

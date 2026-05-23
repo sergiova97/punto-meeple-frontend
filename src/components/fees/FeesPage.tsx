@@ -23,6 +23,8 @@ export default function FeesPage() {
     const [filterUserName, setFilterUserName] = useState('')
     const [filterName, setFilterName] = useState('')
 
+    const [resetSelection, setResetSelection] = useState(false)
+
     const limit = 10
 
     function loadFees() {
@@ -106,6 +108,7 @@ export default function FeesPage() {
                     setPaymentFees(selected)
                     setPaymentOpen(true)
                 }}
+                resetSelection={resetSelection}
             />
 
             <FeeDetailModal
@@ -121,7 +124,7 @@ export default function FeesPage() {
                 open={paymentOpen}
                 onClose={() => setPaymentOpen(false)}
                 fees={paymentFees}
-                onSuccess={() => { setPaymentOpen(false); loadFees() }}
+                onSuccess={() => { setPaymentOpen(false); setResetSelection((prev) => !prev); loadFees() }}
             />
 
             <GenerateFeesModal

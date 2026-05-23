@@ -7,6 +7,7 @@ import { useAuthStore } from '../../store/auth.store'
 import type { Game } from '../../types'
 import {config} from "../../config.ts";
 import {GameDetailModal} from "../../components/games/GameDetailModal.tsx";
+import {GameCreateModal} from "../../components/games/GameCreateModal.tsx";
 
 export default function BoardGamesPage() {
     const [games, setGames] = useState<Game[]>([])
@@ -16,6 +17,9 @@ export default function BoardGamesPage() {
     const [selectedGame, setSelectedGame] = useState<Game | null>(null)
     const [detailOpen, setDetailOpen] = useState(false)
     const [createOpen, setCreateOpen] = useState(false)
+    const [editGame, setEditGame] = useState<Game | null>(null)
+    const [formOpen, setFormOpen] = useState(false)
+
     const limit = 12
 
     const authUser = useAuthStore((state) => state.user)
@@ -88,7 +92,19 @@ export default function BoardGamesPage() {
                 game={selectedGame}
                 open={detailOpen}
                 onClose={() => setDetailOpen(false)}
-                onEdit={() => { setDetailOpen(false) }}
+                onEdit={() => {
+                    setEditGame(selectedGame)
+                    setDetailOpen(false)
+                    setFormOpen(true)
+                }}
+            />
+
+            <GameCreateModal
+                open={createOpen || formOpen}
+                onClose={() => { setCreateOpen(false); setFormOpen(false); setEditGame(null) }}
+                onSave={() => { loadGames(); setCreateOpen(false); setFormOpen(false); setEditGame(null) }}
+                game={editGame}
+                defaultType="BOARD_GAME"
             />
         </div>
     )

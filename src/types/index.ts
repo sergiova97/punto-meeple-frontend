@@ -106,3 +106,17 @@ export interface Game {
     categories: GameCategory[]
     mechanics: GameMechanic[]
 }
+
+export type LoanStatus = 'PENDING' | 'ACTIVE' | 'RETURNED' | 'OVERDUE'
+
+export interface LoanDto {
+    id: number
+    userId: number
+    userName: string
+    gameId: number
+    gameName: string
+    startDate: string
+    endDate: string
+    returnDate: string | null
+    status: LoanStatus
+}

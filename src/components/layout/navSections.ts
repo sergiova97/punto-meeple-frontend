@@ -38,6 +38,8 @@ export const NAV_SECTIONS: NavSection[] = [
         children: [
             { label: 'Juegos de mesa', to: '/board-games' },
             { label: 'Libros de rol', to: '/rpg-books' },
+            { label: 'Mis préstamos', to: '/my-loans' },
+            { label: 'Préstamos', to: '/loans' },
             { label: 'Categorías y mecánicas', to: '/game-settings', roles: [config.roleAdmin, config.roleLibrarian] },
         ],
     },

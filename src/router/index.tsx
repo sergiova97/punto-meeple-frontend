@@ -11,6 +11,8 @@ import PaymentsReviewPage from "../pages/payments/PaymentsReviewPage.tsx";
 import BoardGamesPage from "../pages/games/BoardGamesPage.tsx";
 import RpgBooksPage from "../pages/games/RpgBooksPage.tsx";
 import GameSettingsPage from "../pages/games/GameSettingsPage.tsx";
+import LoansPage from "../pages/loans/LoansPage.tsx";
+import MyLoansPage from "../pages/loans/MyLoansPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -44,6 +46,8 @@ const router = createBrowserRouter([
                     },
                     { path: 'board-games', element: <BoardGamesPage /> },
                     { path: 'rpg-books', element: <RpgBooksPage /> },
+                    { path: 'loans', element: <LoansPage /> },
+                    { path: 'my-loans', element: <MyLoansPage /> },
                     {
                         path: 'game-settings',
                         element: <PrivateRoute roles={[config.roleAdmin, config.roleLibrarian]} />,

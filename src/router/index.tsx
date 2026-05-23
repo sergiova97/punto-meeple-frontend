@@ -6,6 +6,7 @@ import UsersPage from "../pages/auth/UsersPage.tsx";
 import UserDetail from "../pages/users/UserDetail.tsx";
 import FeesPage from "../components/fees/FeesPage.tsx";
 import MyFeesPage from "../components/fees/MyFeesPage.tsx";
+import {config} from "../config.ts";
 
 const router = createBrowserRouter([
     {
@@ -23,7 +24,12 @@ const router = createBrowserRouter([
                     { path: 'dashboard', element: <div>Dashboard</div> },
                     { path: 'users', element: <UsersPage /> },
                     { path: 'users/:id', element: <UserDetail /> },
-                    { path: 'fees', element: <FeesPage /> },
+                    {
+                        path: 'fees',
+                        element: <PrivateRoute roles={[config.roleAdmin, config.roleTreasurer]} />,
+                        children: [
+                            { index: true, element: <FeesPage /> },
+                        ], },
                     { path: 'my-fees', element: <MyFeesPage /> },
                 ],
             }

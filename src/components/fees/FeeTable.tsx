@@ -80,7 +80,7 @@ export function FeeTable({ fees, total, page, onPageChange, onRowClick, onPay, s
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                {showSelectAll &&
+                {showSelectAll ? (
                     <button
                         type="button"
                         onClick={toggleAllPayable}
@@ -97,7 +97,7 @@ export function FeeTable({ fees, total, page, onPageChange, onRowClick, onPay, s
                     >
                         {allPayableSelected ? 'Deseleccionar todas' : 'Seleccionar pendientes y vencidas'}
                     </button>
-                }
+                ): <div />}
 
                 {onPay && selectedIds.length > 0 && (
                     <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>

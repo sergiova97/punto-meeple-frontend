@@ -5,6 +5,7 @@ import { gamesApi } from '../../api/games.api';
 import { gameCategoriesApi } from '../../api/game-categories.api';
 import { gameMechanicsApi } from '../../api/game-mechanics.api';
 import type { Game, GameCategory, GameMechanic, GameType } from '../../types';
+import {config} from "../../config.ts";
 
 interface GameCreateModalProps {
     open: boolean
@@ -25,6 +26,9 @@ export function GameCreateModal({ open, onClose, onSave, game, defaultType }: Ga
     const [mechanicIds, setMechanicIds] = useState<number[]>([])
     const [categories, setCategories] = useState<GameCategory[]>([])
     const [mechanics, setMechanics] = useState<GameMechanic[]>([])
+    const [imageFile, setImageFile] = useState<File | null>(null)
+    const [imagePreview, setImagePreview] = useState<string | null>(null)
+
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
@@ -42,6 +46,8 @@ export function GameCreateModal({ open, onClose, onSave, game, defaultType }: Ga
                 setPublisher(game.publisher)
                 setCategoryIds(game.categories.map((c) => c.id))
                 setMechanicIds(game.mechanics.map((m) => m.id))
+                setImageFile(null)
+                setImagePreview(null)
             } else {
                 setName('')
                 setDescription('')
@@ -51,6 +57,8 @@ export function GameCreateModal({ open, onClose, onSave, game, defaultType }: Ga
                 setPublisher('')
                 setCategoryIds([])
                 setMechanicIds([])
+                setImageFile(null)
+                setImagePreview(null)
             }
         }
     }, [open, game])
@@ -75,8 +83,14 @@ export function GameCreateModal({ open, onClose, onSave, game, defaultType }: Ga
 
             if (game) {
                 await gamesApi.update({ id: game.id, ...data })
+                if (imageFile) {
+                    await gamesApi.uploadImage(game.id, imageFile)
+                }
             } else {
-                await gamesApi.create(data)
+                const created = await gamesApi.create(data)
+                if (imageFile) {
+                    await gamesApi.uploadImage(created.id, imageFile)
+                }
             }
 
             onSave()
@@ -116,6 +130,33 @@ export function GameCreateModal({ open, onClose, onSave, game, defaultType }: Ga
 
     return (
         <Modal open={open} onClose={onClose} title={title} width={560}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                    width: '100%',
+                    aspectRatio: '16/9',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    background: 'var(--bg-app)',
+                    border: '1px solid var(--border)',
+                }}>
+                    <img
+                        src={imagePreview ?? (game?.image ? `${config.apiUrl}/uploads/${game.image}` : (defaultType === 'BOARD_GAME' ? '/default-board-game.png' : '/default-rpg.png'))}
+                        alt="Imagen del juego"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                </div>
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                            setImageFile(file)
+                            setImagePreview(URL.createObjectURL(file))
+                        }
+                    }}
+                />
+            </div>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>

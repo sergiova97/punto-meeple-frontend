@@ -19,9 +19,9 @@ export default function UserDetail() {
     const user_auth = useAuthStore((state) => state.user)
     const canEdit =
         user_auth?.id === user?.id ||
-        user_auth?.roles.some((r) => r.id.toString() === config.roleAdmin)
-    const canEditRoles = user_auth?.roles.some((r) => r.id.toString() === config.roleAdmin)
-    const canDelete = user_auth?.roles.some((r) => r.id.toString() === config.roleAdmin)
+        user_auth?.roles.some((r) => r.name === config.roleAdmin)
+    const canEditRoles = user_auth?.roles.some((r) => r.name === config.roleAdmin)
+    const canDelete = user_auth?.roles.some((r) => r.name === config.roleAdmin)
 
     async function handleDelete() {
         if (!user || !window.confirm(`¿Seguro que quieres desactivar a ${user.name} ${user.surname}?`)) return

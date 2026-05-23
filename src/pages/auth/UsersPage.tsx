@@ -24,7 +24,7 @@ export default function UsersPage() {
     const navigate = useNavigate()
     const user_auth = useAuthStore((state) => state.user)
 
-    const canCreate = user_auth?.roles.some((r) => r.id.toString() === config.roleAdmin)
+    const canCreate = user_auth?.roles.some((r) => r.name === config.roleAdmin)
 
     function loadUsers() {
         usersApi.getAll(page, limit).then((res) => {

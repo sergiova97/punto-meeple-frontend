@@ -1,10 +1,18 @@
 import {faMoneyBill, faUsers} from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import {config} from "../../config.ts";
+
+export interface NavChild {
+    label: string
+    to: string
+    roles?: string[]
+}
 
 export interface NavSection {
     label: string
     icon: IconDefinition
-    children: { label: string; to: string }[]
+    children: NavChild[]
+    roles?: string[]
 }
 
 export const NAV_SECTIONS: NavSection[] = [
@@ -20,7 +28,7 @@ export const NAV_SECTIONS: NavSection[] = [
         icon: faMoneyBill,
         children: [
             { label: 'Mis cuotas', to: '/my-fees' },
-            { label: 'Todas las cuotas', to: '/fees' },
+            { label: 'Todas las cuotas', to: '/fees', roles: [config.roleAdmin, config.roleTreasurer] },
         ],
     },
 ]

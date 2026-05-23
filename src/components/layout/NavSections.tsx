@@ -3,12 +3,16 @@ import { NavLink } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { NAV_SECTIONS } from './navSections'
+import {useAuthStore} from "../../store/auth.store.ts";
 
 interface NavSectionsProps {
     onNavigate?: () => void
 }
 
 export function NavSections({ onNavigate }: NavSectionsProps) {
+    const user = useAuthStore((state) => state.user)
+    const userRoles = user?.roles.map((r) => r.name) ?? []
+
     const [openSections, setOpenSections] = useState<string[]>(
         NAV_SECTIONS.map((s) => s.label),
     )
@@ -21,10 +25,25 @@ export function NavSections({ onNavigate }: NavSectionsProps) {
         )
     }
 
+    function hasAccess(roles?: string[]) {
+        if (!roles || roles.length === 0) return true
+
+        return roles.some((r) => userRoles.includes(r))
+    }
+
+    const visibleSections = NAV_SECTIONS.filter((s) => {
+        if (!hasAccess(s.roles)) return false
+
+        const visibleChildren = s.children.filter((c) => hasAccess(c.roles))
+        return visibleChildren.length > 0
+    })
+
     return (
         <nav style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
-            {NAV_SECTIONS.map((section) => {
+
+            {visibleSections.map((section) => {
                 const isOpen = openSections.includes(section.label)
+                const visibleChildren = section.children.filter((c) => hasAccess(c.roles))
 
                 return (
                     <div key={section.label}>
@@ -44,16 +63,16 @@ export function NavSections({ onNavigate }: NavSectionsProps) {
                                 color: 'var(--text-primary)',
                             }}
                         >
-              <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <FontAwesomeIcon icon={section.icon} style={{ width: '16px' }} />
-                <span>{section.label}</span>
-              </span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <FontAwesomeIcon icon={section.icon} style={{ width: '16px' }} />
+                            <span>{section.label}</span>
+                        </span>
                             <FontAwesomeIcon icon={isOpen ? faChevronUp : faChevronDown} style={{ width: '12px' }} />
                         </button>
 
                         {isOpen && (
                             <div style={{ paddingLeft: '16px' }}>
-                                {section.children.map((child) => (
+                                {visibleChildren.map((child) => (
                                     <NavLink
                                         key={child.to}
                                         to={child.to}

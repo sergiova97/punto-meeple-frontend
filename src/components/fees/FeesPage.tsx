@@ -20,12 +20,14 @@ export default function FeesPage() {
 
     const [filterStatus, setFilterStatus] = useState<string>('PENDING')
     const [filterPeriod, setFilterPeriod] = useState('')
+    const [filterUserName, setFilterUserName] = useState('')
     const [filterName, setFilterName] = useState('')
 
     const limit = 10
 
     function loadFees() {
         membershipFeesApi.getAll({
+            userName: filterUserName || undefined,
             status: filterStatus || undefined,
             period: filterPeriod || undefined,
             page,
@@ -38,7 +40,7 @@ export default function FeesPage() {
 
     useEffect(() => {
         loadFees()
-    }, [page, filterStatus, filterPeriod])
+    }, [page, filterStatus, filterPeriod, filterUserName])
 
     async function handleStatusChange(ids: number[], status: MembershipFeeStatus) {
         await membershipFeesApi.updateStatus(ids, status)
@@ -70,8 +72,8 @@ export default function FeesPage() {
                 <input
                     style={inputStyle}
                     placeholder="Buscar por nombre..."
-                    value={filterName}
-                    onChange={(e) => setFilterName(e.target.value)}
+                    value={filterUserName}
+                    onChange={(e) => { setFilterUserName(e.target.value); setPage(1) }}
                 />
                 <input
                     style={inputStyle}
@@ -93,7 +95,7 @@ export default function FeesPage() {
             </div>
 
             <FeeTable
-                fees={filteredFees}
+                fees={fees}
                 total={total}
                 page={page}
                 onPageChange={setPage}

@@ -28,6 +28,32 @@ export function TopBar() {
             gap: '8px',
             flexShrink: 0,
         }}>
+            {import.meta.env.VITE_ENV === 'dev' && user?.roles && (
+                <div style={{
+                    display: 'flex',
+                    gap: '6px',
+                    alignItems: 'center',
+                    marginRight: '12px',
+                    paddingRight: '12px',
+                    borderRight: '1px solid var(--border)',
+                }}>
+                    {user.roles.map((r) => (
+                        <span
+                            key={r.id}
+                            style={{
+                                fontSize: '0.7rem',
+                                fontWeight: 600,
+                                padding: '2px 8px',
+                                borderRadius: '99px',
+                                background: 'var(--color-secondary)',
+                                color: 'var(--color-primary)',
+                            }}
+                        >
+                        {r.name}
+                      </span>
+                    ))}
+                </div>
+            )}
             <button
                 onClick={handleProfile}
                 title="Mi perfil"

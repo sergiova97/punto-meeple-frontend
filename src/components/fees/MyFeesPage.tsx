@@ -13,7 +13,7 @@ export default function MyFeesPage() {
     const [selectedFee, setSelectedFee] = useState<MembershipFeeDto | null>(null)
     const [detailOpen, setDetailOpen] = useState(false)
     const [paymentOpen, setPaymentOpen] = useState(false)
-    const [paymentFees, setPaymentFees] = useState<number[]>([])
+    const [paymentFees, setPaymentFees] = useState<MembershipFeeDto[]>([])
     const [resetSelection, setResetSelection] = useState(false)
 
     const [filterStatus, setFilterStatus] = useState('')

@@ -2,7 +2,7 @@ import apiClient from './client'
 import type { MembershipFeeDto, MembershipFeeStatus, PaginatedResponse } from '../types'
 
 export const membershipFeesApi = {
-    getAll: (params: { userName?: string; status?: string; period?: string; page?: number; limit?: number }) =>
+    getAll: (params: { userName?: string; userId?:number; status?: string; period?: string; page?: number; limit?: number }) =>
         apiClient.get<PaginatedResponse<MembershipFeeDto>>('/membership-fees', { params }).then((r) => r.data),
 
     getById: (id: number) =>

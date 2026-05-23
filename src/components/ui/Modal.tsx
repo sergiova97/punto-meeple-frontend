@@ -7,9 +7,10 @@ interface ModalProps {
     onClose: () => void
     title: string
     children: ReactNode
+    width?: number
 }
 
-export function Modal({ open, onClose, title, children }: ModalProps) {
+export function Modal({ open, onClose, title, children, width }: ModalProps) {
     if (!open) return null
 
     return (
@@ -24,6 +25,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
                 justifyContent: 'center',
                 zIndex: 1000,
                 padding: '24px',
+                maxWidth: width ? `${width}px` : '480px',
             }}
         >
             <div

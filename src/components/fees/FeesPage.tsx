@@ -21,7 +21,6 @@ export default function FeesPage() {
     const [filterStatus, setFilterStatus] = useState<string>('PENDING')
     const [filterPeriod, setFilterPeriod] = useState('')
     const [filterUserName, setFilterUserName] = useState('')
-    const [filterName, setFilterName] = useState('')
 
     const [resetSelection, setResetSelection] = useState(false)
 
@@ -48,10 +47,6 @@ export default function FeesPage() {
         await membershipFeesApi.updateStatus(ids, status)
         loadFees()
     }
-
-    const filteredFees = filterName
-        ? fees.filter((f) => f.userName.toLowerCase().includes(filterName.toLowerCase()))
-        : fees
 
     const inputStyle: React.CSSProperties = {
         padding: '8px 12px',

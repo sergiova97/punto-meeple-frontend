@@ -15,6 +15,7 @@ export default function FeesPage() {
     const [detailOpen, setDetailOpen] = useState(false)
     const [paymentOpen, setPaymentOpen] = useState(false)
     const [paymentFees, setPaymentFees] = useState<MembershipFeeDto[]>([])
+    const [selectedFeeIds, setSelectedFeeIds] = useState<number[]>([])
 
     const [generateOpen, setGenerateOpen] = useState(false)
 
@@ -59,35 +60,45 @@ export default function FeesPage() {
     return (
         <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-                <Button variant="primary" onClick={() => setGenerateOpen(true)}>
-                    Generar cuotas
-                </Button>
-            </div>
-
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '16px' }}>
-                <input
-                    style={inputStyle}
-                    placeholder="Buscar por nombre..."
-                    value={filterUserName}
-                    onChange={(e) => { setFilterUserName(e.target.value); setPage(1) }}
-                />
-                <input
-                    style={inputStyle}
-                    placeholder="Periodo (ej: 2026-01)"
-                    value={filterPeriod}
-                    onChange={(e) => { setFilterPeriod(e.target.value); setPage(1) }}
-                />
-                <select
-                    style={inputStyle}
-                    value={filterStatus}
-                    onChange={(e) => { setFilterStatus(e.target.value); setPage(1) }}
-                >
-                    <option value="">Todos los estados</option>
-                    <option value="PENDING">Pendiente</option>
-                    <option value="PAID">Pagada</option>
-                    <option value="OVERDUE">Vencida</option>
-                    <option value="IN_REVIEW">En revisión</option>
-                </select>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '16px' }}>
+                    <input
+                        style={inputStyle}
+                        placeholder="Buscar por nombre..."
+                        value={filterUserName}
+                        onChange={(e) => { setFilterUserName(e.target.value); setPage(1) }}
+                    />
+                    <input
+                        style={inputStyle}
+                        placeholder="Periodo (ej: 2026-01)"
+                        value={filterPeriod}
+                        onChange={(e) => { setFilterPeriod(e.target.value); setPage(1) }}
+                    />
+                    <select
+                        style={inputStyle}
+                        value={filterStatus}
+                        onChange={(e) => { setFilterStatus(e.target.value); setPage(1) }}
+                    >
+                        <option value="">Todos los estados</option>
+                        <option value="PENDING">Pendiente</option>
+                        <option value="PAID">Pagada</option>
+                        <option value="OVERDUE">Vencida</option>
+                        <option value="IN_REVIEW">En revisión</option>
+                    </select>
+                </div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    {selectedFeeIds.length > 0 && (
+                        <Button variant="secondary" onClick={() => {
+                            const selected = fees.filter((f) => selectedFeeIds.includes(f.id))
+                            setPaymentFees(selected)
+                            setPaymentOpen(true)
+                        }}>
+                            Pagar seleccionadas ({selectedFeeIds.length})
+                        </Button>
+                    )}
+                    <Button variant="primary" onClick={() => setGenerateOpen(true)}>
+                        Generar cuotas
+                    </Button>
+                </div>
             </div>
 
             <FeeTable
@@ -97,11 +108,7 @@ export default function FeesPage() {
                 onPageChange={setPage}
                 showUserColumn={true}
                 onRowClick={(fee) => { setSelectedFee(fee); setDetailOpen(true) }}
-                onPay={(ids) => {
-                    const selected = fees.filter((f) => ids.includes(f.id))
-                    setPaymentFees(selected)
-                    setPaymentOpen(true)
-                }}
+                onSelectionChange={setSelectedFeeIds}
                 resetSelection={resetSelection}
             />
 

@@ -5,6 +5,7 @@ import { FeeDetailModal } from './FeeDetailModal.tsx'
 import { PaymentModal } from '../payments/PaymentModal.tsx'
 import { useAuthStore } from '../../store/auth.store.ts'
 import type { MembershipFeeDto } from '../../types'
+import {Button} from "../../components/ui/Button.tsx";
 
 export default function MyFeesPage() {
     const [fees, setFees] = useState<MembershipFeeDto[]>([])
@@ -15,6 +16,7 @@ export default function MyFeesPage() {
     const [paymentOpen, setPaymentOpen] = useState(false)
     const [paymentFees, setPaymentFees] = useState<MembershipFeeDto[]>([])
     const [resetSelection, setResetSelection] = useState(false)
+    const [selectedFeeIds, setSelectedFeeIds] = useState<number[]>([])
 
     const [filterStatus, setFilterStatus] = useState('')
     const [filterPeriod, setFilterPeriod] = useState('')
@@ -50,24 +52,38 @@ export default function MyFeesPage() {
 
     return (
         <div>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '16px' }}>
-                <input
-                    style={inputStyle}
-                    placeholder="Periodo (ej: 2026-1)"
-                    value={filterPeriod}
-                    onChange={(e) => { setFilterPeriod(e.target.value); setPage(1) }}
-                />
-                <select
-                    style={inputStyle}
-                    value={filterStatus}
-                    onChange={(e) => { setFilterStatus(e.target.value); setPage(1) }}
-                >
-                    <option value="">Todos los estados</option>
-                    <option value="PENDING">Pendiente</option>
-                    <option value="PAID">Pagada</option>
-                    <option value="OVERDUE">Vencida</option>
-                    <option value="IN_REVIEW">En revisión</option>
-                </select>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', gap: '12px', flexWrap: 'wrap' }}>
+
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '16px' }}>
+                    <input
+                        style={inputStyle}
+                        placeholder="Periodo (ej: 2026-1)"
+                        value={filterPeriod}
+                        onChange={(e) => { setFilterPeriod(e.target.value); setPage(1) }}
+                    />
+                    <select
+                        style={inputStyle}
+                        value={filterStatus}
+                        onChange={(e) => { setFilterStatus(e.target.value); setPage(1) }}
+                    >
+                        <option value="">Todos los estados</option>
+                        <option value="PENDING">Pendiente</option>
+                        <option value="PAID">Pagada</option>
+                        <option value="OVERDUE">Vencida</option>
+                        <option value="IN_REVIEW">En revisión</option>
+                    </select>
+                </div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    {selectedFeeIds.length > 0 && (
+                        <Button variant="primary" onClick={() => {
+                            const selected = fees.filter((f) => selectedFeeIds.includes(f.id))
+                            setPaymentFees(selected)
+                            setPaymentOpen(true)
+                        }}>
+                            Pagar seleccionadas ({selectedFeeIds.length})
+                        </Button>
+                    )}
+                </div>
             </div>
 
             <FeeTable
@@ -78,11 +94,7 @@ export default function MyFeesPage() {
                 showUserColumn={false}
                 showSelectAll={true}
                 onRowClick={(fee) => { setSelectedFee(fee); setDetailOpen(true) }}
-                onPay={(ids) => {
-                    const selected = fees.filter((f) => ids.includes(f.id))
-                    setPaymentFees(selected)
-                    setPaymentOpen(true)
-                }}
+                onSelectionChange={setSelectedFeeIds}
                 resetSelection={resetSelection}
             />
 

@@ -2,7 +2,6 @@ import {useEffect, useState} from 'react'
 import { Table } from '../../components/ui/Table.tsx'
 import { Pagination } from '../../components/ui/Pagination.tsx'
 import { Badge } from '../../components/ui/Badge.tsx'
-import { Button } from '../../components/ui/Button.tsx'
 import type { MembershipFeeDto, MembershipFeeStatus } from '../../types'
 
 interface FeeTableProps {
@@ -11,7 +10,7 @@ interface FeeTableProps {
     page: number
     onPageChange: (page: number) => void
     onRowClick: (fee: MembershipFeeDto) => void
-    onPay?: (ids: number[]) => void
+    onSelectionChange?: (ids: number[]) => void
     showUserColumn?: boolean
     showSelectAll?: boolean
     resetSelection?: boolean
@@ -26,7 +25,7 @@ const STATUS_BADGE: Record<MembershipFeeStatus, { label: string; variant: 'succe
 
 const PAYABLE_STATUSES: MembershipFeeStatus[] = ['PENDING', 'OVERDUE']
 
-export function FeeTable({ fees, total, page, onPageChange, onRowClick, onPay, showUserColumn = false, showSelectAll = false, resetSelection = false }: FeeTableProps) {
+export function FeeTable({ fees, total, page, onPageChange, onRowClick, onSelectionChange, showUserColumn = false, showSelectAll = false, resetSelection = false }: FeeTableProps) {
     const [selectedIds, setSelectedIds] = useState<number[]>([])
     const limit = 10
     const totalPages = Math.ceil(total / limit)
@@ -34,8 +33,8 @@ export function FeeTable({ fees, total, page, onPageChange, onRowClick, onPay, s
     const allPayableSelected = payableFees.length > 0 && payableFees.every((f) => selectedIds.includes(f.id))
 
     useEffect(() => {
-        setSelectedIds([])
-    }, [resetSelection])
+        onSelectionChange?.(selectedIds)
+    }, [selectedIds])
 
     function toggleSelect(id: number, status: MembershipFeeStatus) {
         if (!PAYABLE_STATUSES.includes(status)) return
@@ -98,14 +97,6 @@ export function FeeTable({ fees, total, page, onPageChange, onRowClick, onPay, s
                         {allPayableSelected ? 'Deseleccionar todas' : 'Seleccionar pendientes y vencidas'}
                     </button>
                 ): <div />}
-
-                {onPay && selectedIds.length > 0 && (
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
-                        <Button variant="primary" onClick={() => onPay(selectedIds)}>
-                            Pagar seleccionadas ({selectedIds.length})
-                        </Button>
-                    </div>
-                )}
             </div>
 
             <Table

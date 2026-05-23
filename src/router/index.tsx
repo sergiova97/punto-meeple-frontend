@@ -9,6 +9,7 @@ import MyFeesPage from "../pages/fees/MyFeesPage.tsx";
 import {config} from "../config.ts";
 import PaymentsReviewPage from "../pages/payments/PaymentsReviewPage.tsx";
 import BoardGamesPage from "../pages/games/BoardGamesPage.tsx";
+import RpgBooksPage from "../pages/games/RpgBooksPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
                         ],
                     },
                     { path: 'board-games', element: <BoardGamesPage /> },
+                    { path: 'rpg-books', element: <RpgBooksPage /> },
                 ],
             }
         ]

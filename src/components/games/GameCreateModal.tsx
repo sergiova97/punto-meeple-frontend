@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
-import { Modal } from '../ui/Modal'
-import { Button } from '../ui/Button'
-import { gamesApi } from '../../api/games.api'
-import { gameCategoriesApi } from '../../api/game-categories.api'
-import { gameMechanicsApi } from '../../api/game-mechanics.api'
-import type { Game, GameCategory, GameMechanic, GameType } from '../../types'
+import { useEffect, useState } from 'react';
+import { Modal } from '../ui/Modal';
+import { Button } from '../ui/Button';
+import { gamesApi } from '../../api/games.api';
+import { gameCategoriesApi } from '../../api/game-categories.api';
+import { gameMechanicsApi } from '../../api/game-mechanics.api';
+import type { Game, GameCategory, GameMechanic, GameType } from '../../types';
 
 interface GameCreateModalProps {
     open: boolean

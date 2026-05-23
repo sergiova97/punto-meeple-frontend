@@ -1,4 +1,4 @@
-import {faChessBoard, faMoneyBill, faUsers} from '@fortawesome/free-solid-svg-icons';
+import {faCalendarDays, faChessBoard, faMoneyBill, faUsers} from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {config} from "../../config.ts";
 
@@ -41,6 +41,14 @@ export const NAV_SECTIONS: NavSection[] = [
             { label: 'Mis préstamos', to: '/my-loans' },
             { label: 'Préstamos', to: '/loans' },
             { label: 'Categorías y mecánicas', to: '/game-settings', roles: [config.roleAdmin, config.roleLibrarian] },
+        ],
+    },
+    {
+        label: 'Eventos',
+        icon: faCalendarDays,
+        children: [
+            { label: 'Mis eventos', to: '/my-events' },
+            { label: 'Todos los eventos', to: '/events' },
         ],
     },
 ]

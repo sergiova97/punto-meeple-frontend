@@ -9,6 +9,8 @@ export const ROUTE_NAMES: Record<string, string> = {
     '/game-settings': 'Categorías y mecánicas',
     '/my-loans': 'Mis préstamos',
     '/loans': 'Préstamos',
+    '/my-events': 'Mis eventos',
+    '/events':    'Eventos',
 }
 
 export function getRouteName(pathname: string): string {

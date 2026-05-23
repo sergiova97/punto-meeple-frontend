@@ -13,6 +13,8 @@ import RpgBooksPage from "../pages/games/RpgBooksPage.tsx";
 import GameSettingsPage from "../pages/games/GameSettingsPage.tsx";
 import LoansPage from "../pages/loans/LoansPage.tsx";
 import MyLoansPage from "../pages/loans/MyLoansPage.tsx";
+import EventsPage from "../pages/events/EventsPage.tsx";
+import MyEventsPage from "../pages/events/MyEventsPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -55,6 +57,8 @@ const router = createBrowserRouter([
                             { index: true, element: <GameSettingsPage /> },
                         ],
                     },
+                    { path: 'events', element: <EventsPage /> },
+                    { path: 'my-events', element: <MyEventsPage /> },
                 ],
             }
         ]

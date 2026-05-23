@@ -29,6 +29,7 @@ export const NAV_SECTIONS: NavSection[] = [
         children: [
             { label: 'Mis cuotas', to: '/my-fees' },
             { label: 'Todas las cuotas', to: '/fees', roles: [config.roleAdmin, config.roleTreasurer] },
+            { label: 'Pagos pendientes de revisión', to: '/payments', roles: [config.roleAdmin, config.roleTreasurer] },
         ],
     },
 ]

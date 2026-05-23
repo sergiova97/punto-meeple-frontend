@@ -7,6 +7,7 @@ import UserDetail from "../pages/users/UserDetail.tsx";
 import FeesPage from "../components/fees/FeesPage.tsx";
 import MyFeesPage from "../components/fees/MyFeesPage.tsx";
 import {config} from "../config.ts";
+import PaymentsReviewPage from "../pages/payments/PaymentsReviewPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -31,6 +32,13 @@ const router = createBrowserRouter([
                             { index: true, element: <FeesPage /> },
                         ], },
                     { path: 'my-fees', element: <MyFeesPage /> },
+                    {
+                        path: 'payments',
+                        element: <PrivateRoute roles={[config.roleAdmin, config.roleTreasurer]} />,
+                        children: [
+                            { index: true, element: <PaymentsReviewPage /> },
+                        ],
+                    },
                 ],
             }
         ]

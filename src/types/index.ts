@@ -62,6 +62,18 @@ export interface MembershipFeeDto {
     status: MembershipFeeStatus
 }
 
+export type PaymentStatus = 'IN_REVIEW' | 'ACCEPTED' | 'DENIED'
+
+export interface PaymentDto {
+    id: number
+    userName: string
+    amount: number
+    method: string
+    reference: string
+    status: PaymentStatus
+    periods: string[]
+}
+
 export interface PaginatedResponse<T> {
     data: T[]
     total: number

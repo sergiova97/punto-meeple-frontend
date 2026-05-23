@@ -5,4 +5,5 @@ export const config = {
 
     roleAdmin: import.meta.env.VITE_ROLE_ADMIN,
     roleTreasurer: import.meta.env.VITE_ROLE_TREASURER,
+    roleLibrarian: import.meta.env.VITE_ROLE_LIBRARIAN,
 }

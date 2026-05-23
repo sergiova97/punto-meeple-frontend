@@ -2,12 +2,13 @@ import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { PrivateRoute } from './PrivateRoute';
 import {AppShell} from "../components/layout/AppShell.tsx";
 import LoginPage from "../pages/auth/LoginPage.tsx";
-import UsersPage from "../pages/auth/UsersPage.tsx";
+import UsersPage from "../pages/users/UsersPage.tsx";
 import UserDetail from "../pages/users/UserDetail.tsx";
 import FeesPage from "../pages/fees/FeesPage.tsx";
 import MyFeesPage from "../pages/fees/MyFeesPage.tsx";
 import {config} from "../config.ts";
 import PaymentsReviewPage from "../pages/payments/PaymentsReviewPage.tsx";
+import BoardGamesPage from "../pages/games/BoardGamesPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -39,6 +40,7 @@ const router = createBrowserRouter([
                             { index: true, element: <PaymentsReviewPage /> },
                         ],
                     },
+                    { path: 'board-games', element: <BoardGamesPage /> },
                 ],
             }
         ]

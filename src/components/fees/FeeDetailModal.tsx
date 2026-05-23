@@ -80,7 +80,7 @@ export function FeeDetailModal({ fee, open, onClose, onSuccess, canPay, canChang
             <PaymentModal
                 open={paymentOpen}
                 onClose={() => setPaymentOpen(false)}
-                feeIds={[fee.id]}
+                fees={[fee]}
                 onSuccess={() => {
                     setPaymentOpen(false)
                     onSuccess()

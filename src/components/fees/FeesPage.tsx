@@ -14,7 +14,8 @@ export default function FeesPage() {
     const [selectedFee, setSelectedFee] = useState<MembershipFeeDto | null>(null)
     const [detailOpen, setDetailOpen] = useState(false)
     const [paymentOpen, setPaymentOpen] = useState(false)
-    const [paymentIds, setPaymentIds] = useState<number[]>([])
+    const [paymentFees, setPaymentFees] = useState<MembershipFeeDto[]>([])
+
     const [generateOpen, setGenerateOpen] = useState(false)
 
     const [filterStatus, setFilterStatus] = useState<string>('PENDING')
@@ -98,7 +99,11 @@ export default function FeesPage() {
                 onPageChange={setPage}
                 showUserColumn={true}
                 onRowClick={(fee) => { setSelectedFee(fee); setDetailOpen(true) }}
-                onPay={(ids) => { setPaymentIds(ids); setPaymentOpen(true) }}
+                onPay={(ids) => {
+                    const selected = fees.filter((f) => ids.includes(f.id))
+                    setPaymentFees(selected)
+                    setPaymentOpen(true)
+                }}
             />
 
             <FeeDetailModal
@@ -113,7 +118,7 @@ export default function FeesPage() {
             <PaymentModal
                 open={paymentOpen}
                 onClose={() => setPaymentOpen(false)}
-                feeIds={paymentIds}
+                fees={paymentFees}
                 onSuccess={() => { setPaymentOpen(false); loadFees() }}
             />
 

@@ -13,6 +13,7 @@ interface FeeTableProps {
     onRowClick: (fee: MembershipFeeDto) => void
     onPay?: (ids: number[]) => void
     showUserColumn?: boolean
+    showSelectAll?: boolean
 }
 
 const STATUS_BADGE: Record<MembershipFeeStatus, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'neutral' }> = {
@@ -24,16 +25,26 @@ const STATUS_BADGE: Record<MembershipFeeStatus, { label: string; variant: 'succe
 
 const PAYABLE_STATUSES: MembershipFeeStatus[] = ['PENDING', 'OVERDUE']
 
-export function FeeTable({ fees, total, page, onPageChange, onRowClick, onPay, showUserColumn = false }: FeeTableProps) {
+export function FeeTable({ fees, total, page, onPageChange, onRowClick, onPay, showUserColumn = false, showSelectAll = false }: FeeTableProps) {
     const [selectedIds, setSelectedIds] = useState<number[]>([])
     const limit = 10
     const totalPages = Math.ceil(total / limit)
+    const payableFees = fees.filter((f) => PAYABLE_STATUSES.includes(f.status))
+    const allPayableSelected = payableFees.length > 0 && payableFees.every((f) => selectedIds.includes(f.id))
 
     function toggleSelect(id: number, status: MembershipFeeStatus) {
         if (!PAYABLE_STATUSES.includes(status)) return
         setSelectedIds((prev) =>
             prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
         )
+    }
+
+    function toggleAllPayable() {
+        if (allPayableSelected) {
+            setSelectedIds([])
+        } else {
+            setSelectedIds(payableFees.map((f) => f.id))
+        }
     }
 
     const columns = [
@@ -63,13 +74,34 @@ export function FeeTable({ fees, total, page, onPageChange, onRowClick, onPay, s
 
     return (
         <div>
-            {onPay && selectedIds.length > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
-                    <Button variant="primary" onClick={() => onPay(selectedIds)}>
-                        Pagar seleccionadas ({selectedIds.length})
-                    </Button>
-                </div>
-            )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                {showSelectAll &&
+                    <button
+                        type="button"
+                        onClick={toggleAllPayable}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: payableFees.length === 0 ? 'not-allowed' : 'pointer',
+                            fontSize: '0.8rem',
+                            color: payableFees.length === 0 ? 'var(--text-secondary)' : 'var(--color-primary)',
+                            fontWeight: 600,
+                            opacity: payableFees.length === 0 ? 0.5 : 1,
+                        }}
+                        disabled={payableFees.length === 0}
+                    >
+                        {allPayableSelected ? 'Deseleccionar todas' : 'Seleccionar pendientes y vencidas'}
+                    </button>
+                }
+
+                {onPay && selectedIds.length > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+                        <Button variant="primary" onClick={() => onPay(selectedIds)}>
+                            Pagar seleccionadas ({selectedIds.length})
+                        </Button>
+                    </div>
+                )}
+            </div>
 
             <Table
                 columns={columns}

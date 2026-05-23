@@ -13,7 +13,10 @@ export default function MyFeesPage() {
     const [selectedFee, setSelectedFee] = useState<MembershipFeeDto | null>(null)
     const [detailOpen, setDetailOpen] = useState(false)
     const [paymentOpen, setPaymentOpen] = useState(false)
-    const [paymentIds, setPaymentIds] = useState<number[]>([])
+    const [paymentFees, setPaymentFees] = useState<number[]>([])
+
+    const [filterStatus, setFilterStatus] = useState('')
+    const [filterPeriod, setFilterPeriod] = useState('')
 
     const authUser = useAuthStore((state) => state.user)
     const limit = 10
@@ -22,6 +25,8 @@ export default function MyFeesPage() {
         if (!authUser) return
         membershipFeesApi.getAll({
             userId: authUser.id,
+            status: filterStatus || undefined,
+            period: filterPeriod || undefined,
             page,
             limit,
         }).then((res) => {
@@ -32,12 +37,40 @@ export default function MyFeesPage() {
 
     useEffect(() => {
         loadFees()
-    }, [page])
+    }, [page, filterStatus, filterPeriod])
+
+    const inputStyle: React.CSSProperties = {
+        padding: '8px 12px',
+        borderRadius: '6px',
+        border: '1px solid var(--border)',
+        fontSize: '0.875rem',
+        outline: 'none',
+    }
 
     return (
         <div>
             <div style={{ marginBottom: '24px' }}>
                 <h1>Mis cuotas</h1>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '16px' }}>
+                <input
+                    style={inputStyle}
+                    placeholder="Periodo (ej: 2026-1)"
+                    value={filterPeriod}
+                    onChange={(e) => { setFilterPeriod(e.target.value); setPage(1) }}
+                />
+                <select
+                    style={inputStyle}
+                    value={filterStatus}
+                    onChange={(e) => { setFilterStatus(e.target.value); setPage(1) }}
+                >
+                    <option value="">Todos los estados</option>
+                    <option value="PENDING">Pendiente</option>
+                    <option value="PAID">Pagada</option>
+                    <option value="OVERDUE">Vencida</option>
+                    <option value="IN_REVIEW">En revisión</option>
+                </select>
             </div>
 
             <FeeTable
@@ -46,8 +79,13 @@ export default function MyFeesPage() {
                 page={page}
                 onPageChange={setPage}
                 showUserColumn={false}
+                showSelectAll={true}
                 onRowClick={(fee) => { setSelectedFee(fee); setDetailOpen(true) }}
-                onPay={(ids) => { setPaymentIds(ids); setPaymentOpen(true) }}
+                onPay={(ids) => {
+                    const selected = fees.filter((f) => ids.includes(f.id))
+                    setPaymentFees(selected)
+                    setPaymentOpen(true)
+                }}
             />
 
             <FeeDetailModal
@@ -61,7 +99,7 @@ export default function MyFeesPage() {
             <PaymentModal
                 open={paymentOpen}
                 onClose={() => setPaymentOpen(false)}
-                feeIds={paymentIds}
+                fees={paymentFees}
                 onSuccess={() => { setPaymentOpen(false); loadFees() }}
             />
         </div>

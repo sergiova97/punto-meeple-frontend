@@ -2,18 +2,22 @@ import { useState } from 'react'
 import { Modal } from '../ui/Modal'
 import { Button } from '../ui/Button'
 import { paymentsApi } from '../../api/payments.api'
+import type {MembershipFeeDto} from "../../types";
 
 interface PaymentModalProps {
     open: boolean
     onClose: () => void
-    feeIds: number[]
+    fees: MembershipFeeDto[]
     onSuccess: () => void
 }
 
-export function PaymentModal({ open, onClose, feeIds, onSuccess }: PaymentModalProps) {
+export function PaymentModal({ open, onClose, fees, onSuccess }: PaymentModalProps) {
     const [reference, setReference] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+
+    const total = fees.reduce((sum, fee) => sum + Number(fee.price), 0)
+    const feeIds = fees.map((f) => f.id)
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -46,6 +50,9 @@ export function PaymentModal({ open, onClose, feeIds, onSuccess }: PaymentModalP
             <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
                 {feeIds.length === 1 ? '1 cuota seleccionada' : `${feeIds.length} cuotas seleccionadas`}
             </p>
+            <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text-primary)' }}>
+                {total.toFixed(2)} €
+            </span>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>

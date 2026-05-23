@@ -4,6 +4,8 @@ import { FeeTable } from './FeeTable.tsx'
 import { FeeDetailModal } from './FeeDetailModal.tsx'
 import { PaymentModal } from './PaymentModal.tsx'
 import type { MembershipFeeDto, MembershipFeeStatus } from '../../types'
+import {Button} from "../ui/Button.tsx";
+import {GenerateFeesModal} from "./GenerateFeesModal.tsx";
 
 export default function FeesPage() {
     const [fees, setFees] = useState<MembershipFeeDto[]>([])
@@ -13,6 +15,7 @@ export default function FeesPage() {
     const [detailOpen, setDetailOpen] = useState(false)
     const [paymentOpen, setPaymentOpen] = useState(false)
     const [paymentIds, setPaymentIds] = useState<number[]>([])
+    const [generateOpen, setGenerateOpen] = useState(false)
 
     const [filterStatus, setFilterStatus] = useState<string>('PENDING')
     const [filterPeriod, setFilterPeriod] = useState('')
@@ -57,6 +60,9 @@ export default function FeesPage() {
         <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
                 <h1>Cuotas</h1>
+                <Button variant="primary" onClick={() => setGenerateOpen(true)}>
+                    Generar cuotas
+                </Button>
             </div>
 
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '16px' }}>
@@ -109,6 +115,12 @@ export default function FeesPage() {
                 onClose={() => setPaymentOpen(false)}
                 feeIds={paymentIds}
                 onSuccess={() => { setPaymentOpen(false); loadFees() }}
+            />
+
+            <GenerateFeesModal
+                open={generateOpen}
+                onClose={() => setGenerateOpen(false)}
+                onSuccess={loadFees}
             />
         </div>
     )

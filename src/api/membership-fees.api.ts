@@ -10,4 +10,7 @@ export const membershipFeesApi = {
 
     updateStatus: (ids: number[], status: MembershipFeeStatus) =>
         apiClient.patch('/membership-fees/status', { ids, status }).then((r) => r.data),
+
+    generateFees: (data: { userIds: number[]; periods: string[]; price: number }) =>
+        apiClient.post('/membership-fees/generate-fees', data).then((r) => r.data),
 }

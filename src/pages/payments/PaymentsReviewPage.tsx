@@ -43,11 +43,13 @@ export default function PaymentsReviewPage() {
     }, [page, filterStatus, filterReference])
 
     async function handleAccept(id: number) {
+        if (!window.confirm('¿Seguro que quieres aprobar este pago?')) return
         await paymentsApi.accept(id)
         loadPayments()
     }
 
     async function handleDeny(id: number) {
+        if (!window.confirm('¿Seguro que quieres denegar este pago?')) return
         await paymentsApi.deny(id)
         loadPayments()
     }

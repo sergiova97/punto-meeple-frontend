@@ -23,12 +23,14 @@ export function PaymentDetailModal({ payment, open, onClose, onSuccess }: Paymen
     const { label, variant } = STATUS_BADGE[payment.status]
 
     async function handleAccept() {
+        if (!window.confirm('¿Seguro que quieres aprobar este pago?')) return
         await paymentsApi.accept(payment!.id)
         onSuccess()
         onClose()
     }
 
     async function handleDeny() {
+        if (!window.confirm('¿Seguro que quieres denegar este pago?')) return
         await paymentsApi.deny(payment!.id)
         onSuccess()
         onClose()

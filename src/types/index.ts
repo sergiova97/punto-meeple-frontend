@@ -80,3 +80,29 @@ export interface PaginatedResponse<T> {
     page: number
     limit: number
 }
+
+export type GameType = 'BOARD_GAME' | 'ROLE_PLAYING_GAME'
+
+export interface GameCategory {
+    id: number
+    name: string
+}
+
+export interface GameMechanic {
+    id: number
+    name: string
+}
+
+export interface Game {
+    id: number
+    name: string
+    description: string
+    duration: number | null
+    minPlayers: number | null
+    maxPlayers: number | null
+    publisher: string
+    type: GameType
+    image: string | null
+    categories: GameCategory[]
+    mechanics: GameMechanic[]
+}

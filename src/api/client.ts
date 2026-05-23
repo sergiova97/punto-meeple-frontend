@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {logger} from "../utils/logger.ts";
+import {translateError} from "../utils/errorMessages.ts";
 
 const apiClient = axios.create({
     baseURL: '/api',
@@ -27,11 +28,14 @@ apiClient.interceptors.response.use(
         const status = error.response?.status
         const url = error.config?.url
         const method = error.config?.method?.toUpperCase()
-        console.log('Interceptor ejecutado:', method, url, status)
 
         if (status === 401 && window.location.pathname !== '/login') {
             localStorage.removeItem('pm_token')
             window.location.href = '/login'
+        }
+
+        if (error.response?.data?.message) {
+            error.response.data.message = translateError(error.response.data.message)
         }
 
         logger.error(

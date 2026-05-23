@@ -12,42 +12,69 @@ interface TableProps<T> {
 
 export function Table<T>({ columns, data, keyExtractor, onRowClick }: TableProps<T>) {
     return (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-            <tr style={{ borderBottom: '2px solid #e5e7eb', textAlign: 'left' }}>
-                {columns.map((col) => (
-                    <th key={col.label} style={{ padding: '10px 16px', fontSize: '0.875rem', color: '#6b7280' }}>
-                        {col.label}
-                    </th>
-                ))}
-            </tr>
-            </thead>
-            <tbody>
-            {data.map((row) => (
-                <tr
-                    key={keyExtractor(row)}
-                    onClick={() => onRowClick?.(row)}
-                    style={{
-                        borderBottom: '1px solid #e5e7eb',
-                        cursor: onRowClick ? 'pointer' : 'default',
-                    }}
-                    onMouseEnter={(e) => {
-                        if (onRowClick) {
-                            (e.currentTarget as HTMLTableRowElement).style.background = 'var(--color-secondary)'
-                        }
-                    }}
-                    onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLTableRowElement).style.background = 'none'
-                    }}
-                >
+        <div style={{
+            borderRadius: '12px',
+            overflow: 'hidden',
+            border: '1px solid var(--border)',
+            boxShadow: 'var(--shadow-sm)',
+        }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                <tr style={{ background: 'var(--color-primary)' }}>
                     {columns.map((col) => (
-                        <td key={col.label} style={{ padding: '12px 16px', fontSize: '0.9rem' }}>
-                            {col.render(row)}
-                        </td>
+                        <th
+                            key={col.label}
+                            style={{
+                                padding: '12px 16px',
+                                fontSize: '0.8rem',
+                                fontWeight: 600,
+                                color: '#ffffff',
+                                textAlign: 'left',
+                                letterSpacing: '0.03em',
+                                textTransform: 'uppercase',
+                            }}
+                        >
+                            {col.label}
+                        </th>
                     ))}
                 </tr>
-            ))}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {data.map((row, index) => (
+                    <tr
+                        key={keyExtractor(row)}
+                        onClick={() => onRowClick?.(row)}
+                        style={{
+                            background: index % 2 === 0 ? '#ffffff' : '#f8f9ff',
+                            cursor: onRowClick ? 'pointer' : 'default',
+                            transition: 'background 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                            if (onRowClick) {
+                                (e.currentTarget as HTMLTableRowElement).style.background = 'var(--color-secondary)'
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            (e.currentTarget as HTMLTableRowElement).style.background = index % 2 === 0 ? '#ffffff' : '#f8f9ff'
+                        }}
+                    >
+                        {columns.map((col) => (
+                            <td
+                                key={col.label}
+                                style={{
+                                    padding: '12px 16px',
+                                    fontSize: '0.875rem',
+                                    color: 'var(--text-primary)',
+                                    borderBottom: '1px solid var(--border)',
+                                }}
+                            >
+                                {col.render(row)}
+                            </td>
+                        ))}
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+        </div>
     )
 }

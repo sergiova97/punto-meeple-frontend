@@ -1,11 +1,15 @@
 import { Modal } from '../ui/Modal'
 import { Badge } from '../ui/Badge'
 import type { LoanDto, LoanStatus } from '../../types'
+import {useAuthStore} from "../../store/auth.store.ts";
+import {loansApi} from "../../api/loans.api.ts";
+import {Button} from "../ui/Button.tsx";
 
 interface LoanDetailModalProps {
     loan: LoanDto | null
     open: boolean
     onClose: () => void
+    onSuccess?: () => void
 }
 
 const STATUS_BADGE: Record<LoanStatus, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'neutral' }> = {
@@ -15,9 +19,21 @@ const STATUS_BADGE: Record<LoanStatus, { label: string; variant: 'success' | 'wa
     OVERDUE:  { label: 'Vencido',   variant: 'danger' },
 }
 
-export function LoanDetailModal({ loan, open, onClose }: LoanDetailModalProps) {
+export function LoanDetailModal({ loan, open, onClose, onSuccess }: LoanDetailModalProps) {
+    const authUser = useAuthStore((state) => state.user)
+
     if (!loan) return null
+
     const { label, variant } = STATUS_BADGE[loan.status]
+    const isOwner = authUser?.id === loan.userId
+
+    async function handleStatusChange(status: LoanStatus) {
+        if (!authUser) return
+        if (!window.confirm(`¿Seguro que quieres cambiar el estado a ${STATUS_BADGE[status].label}?`)) return
+        await loansApi.updateStatus(loan.id, status, authUser.id)
+        onSuccess?.()
+        onClose()
+    }
 
     return (
         <Modal open={open} onClose={onClose} title="Detalle del préstamo">
@@ -48,6 +64,25 @@ export function LoanDetailModal({ loan, open, onClose }: LoanDetailModalProps) {
                         </div>
                     )}
                 </div>
+                {isOwner && (
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '8px' }}>
+                        {loan.status === 'PENDING' && (
+                            <>
+                                <Button variant="danger" onClick={() => handleStatusChange('RETURNED')}>
+                                    Cancelar
+                                </Button>
+                                <Button variant="primary" onClick={() => handleStatusChange('ACTIVE')}>
+                                    Activar
+                                </Button>
+                            </>
+                        )}
+                        {(loan.status === 'ACTIVE' || loan.status === 'OVERDUE') && (
+                            <Button variant="primary" onClick={() => handleStatusChange('RETURNED')}>
+                                Devolver
+                            </Button>
+                        )}
+                    </div>
+                )}
             </div>
         </Modal>
     )

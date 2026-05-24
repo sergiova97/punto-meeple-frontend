@@ -21,6 +21,6 @@ export const loansApi = {
     create: (data: { userId: number; gameId: number; startDate: string; endDate: string }) =>
         apiClient.post<LoanDto>('/loans', data).then((r) => r.data),
 
-    updateStatus: (id: number, status: LoanStatus) =>
-        apiClient.patch(`/loans/${id}/status`, { status }).then((r) => r.data),
+    updateStatus: (id: number, status: LoanStatus, userId: number) =>
+        apiClient.patch(`/loans/${id}/status`, { status, userId }).then((r) => r.data),
 }

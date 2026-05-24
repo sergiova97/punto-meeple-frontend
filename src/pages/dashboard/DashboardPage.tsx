@@ -6,10 +6,51 @@ import { paymentsApi } from '../../api/payments.api'
 import { membershipFeesApi } from '../../api/membership-fees.api'
 import { loansApi } from '../../api/loans.api'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
+import {faArrowRight, faTriangleExclamation} from '@fortawesome/free-solid-svg-icons'
 import {config} from "../../config.ts";
-import type {LoanDto} from "../../types";
+import type {EventDto, EventStatus, LoanDto} from "../../types";
 import {LoanDetailModal} from "../../components/loans/LoanDetailModal.tsx";
+import {eventsApi} from "../../api/events.api.ts";
+import {Badge} from "../../components/ui/Badge.tsx";
+import {Pagination} from "../../components/ui/Pagination.tsx";
+import {Table} from "../../components/ui/Table.tsx";
+
+const STATUS_BADGE: Record<EventStatus, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'neutral' }> = {
+    OPEN:      { label: 'Abierto',    variant: 'success' },
+    FULL:      { label: 'Completo',   variant: 'warning' },
+    CANCELLED: { label: 'Cancelado',  variant: 'danger' },
+    FINISHED:  { label: 'Finalizado', variant: 'neutral' },
+}
+
+const eventColumns = [
+    {
+        label: 'Título',
+        render: (e: EventDto) => e.title,
+    },
+    {
+        label: 'Juego',
+        render: (e: EventDto) => e.gameName ?? '—',
+    },
+    {
+        label: 'Fecha',
+        render: (e: EventDto) => new Date(e.dateTime).toLocaleString('es-ES', {
+            day: '2-digit', month: 'short',
+            hour: '2-digit', minute: '2-digit',
+        }),
+    },
+    {
+        label: 'Jugadores',
+        render: (e: EventDto) => `${e.participantCount} / ${e.maxPlayers}`,
+    },
+    {
+        label: 'Estado',
+        render: (e: EventDto) => {
+            const { label, variant } = STATUS_BADGE[e.status]
+            return <Badge variant={variant}>{label}</Badge>
+        },
+    },
+]
+
 
 interface Notification {
     message: string
@@ -24,6 +65,11 @@ export default function DashboardPage() {
     const [notifications, setNotifications] = useState<Notification[]>([])
     const [selectedLoan, setSelectedLoan] = useState<LoanDto | null>(null)
     const [loanModalOpen, setLoanModalOpen] = useState(false)
+
+    const [upcomingEvents, setUpcomingEvents] = useState<EventDto[]>([])
+    const [eventsTotal, setEventsTotal] = useState(0)
+    const [eventsPage, setEventsPage] = useState(1)
+    const eventsLimit = 5
 
     const isAdmin = authUser?.roles.some((r) => r.name === config.roleAdmin)
     const isTreasurer = authUser?.roles.some((r) => r.name === config.roleTreasurer)
@@ -117,6 +163,24 @@ export default function DashboardPage() {
         setNotifications(notifs)
     }
 
+    function getNextSevenDays() {
+        const today = new Date()
+        const in7Days = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)
+        return {
+            dateFrom: today.toISOString().split('T')[0],
+            dateTo: in7Days.toISOString().split('T')[0],
+        }
+    }
+
+    useEffect(() => {
+        const { dateFrom, dateTo } = getNextSevenDays()
+        eventsApi.getAll({ dateFrom, dateTo, page: eventsPage, limit: eventsLimit })
+            .then((res) => {
+                setUpcomingEvents(res.data)
+                setEventsTotal(res.total)
+            })
+    }, [eventsPage])
+
     useEffect(() => {
         loadNotifications()
     }, [authUser])
@@ -159,7 +223,60 @@ export default function DashboardPage() {
                 </div>
             )}
 
-            <Calendar />
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'auto 1fr',
+                gap: '24px',
+                alignItems: 'start',
+            }}>
+                <Calendar />
+
+                <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid var(--border)', padding: '20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                        <h2 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                            Eventos próximos (7 días)
+                        </h2>
+                        <span
+                            onClick={() => {
+                                const { dateFrom, dateTo } = getNextSevenDays()
+                                navigate(`/events?dateFrom=${dateFrom}&dateTo=${dateTo}`)
+                            }}
+                            style={{
+                                fontSize: '0.8rem',
+                                color: 'var(--color-primary)',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontWeight: 500,
+                            }}
+                        >
+                            Ver todos <FontAwesomeIcon icon={faArrowRight} style={{ width: '12px' }} />
+                        </span>
+                    </div>
+
+                    {upcomingEvents.length === 0 ? (
+                        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', textAlign: 'center', padding: '24px 0' }}>
+                            No hay eventos en los próximos 7 días
+                        </p>
+                    ) : (
+                        <>
+                            <Table
+                                columns={eventColumns}
+                                data={upcomingEvents}
+                                keyExtractor={(e) => e.id}
+                            />
+                            {eventsTotal > eventsLimit && (
+                                <Pagination
+                                    page={eventsPage}
+                                    totalPages={Math.ceil(eventsTotal / eventsLimit)}
+                                    onPageChange={setEventsPage}
+                                />
+                            )}
+                        </>
+                    )}
+                </div>
+            </div>
 
             <LoanDetailModal
                 loan={selectedLoan}

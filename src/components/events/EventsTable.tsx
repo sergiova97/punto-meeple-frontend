@@ -20,13 +20,17 @@ const STATUS_BADGE: Record<EventStatus, { label: string; variant: 'success' | 'w
 
 interface EventsTableProps {
     onlyMine?: boolean
+    initialDateFrom?: string
+    initialDateTo?: string
 }
 
-export function EventsTable({ onlyMine = false }: EventsTableProps) {
+export function EventsTable({ onlyMine = false, initialDateTo, initialDateFrom }: EventsTableProps) {
     const [events, setEvents] = useState<EventDto[]>([])
     const [total, setTotal] = useState(0)
     const [page, setPage] = useState(1)
     const [filterTitle, setFilterTitle] = useState('')
+    const [filterDateFrom, setFilterDateFrom] = useState(initialDateFrom ?? '')
+    const [filterDateTo, setFilterDateTo] = useState(initialDateTo ?? '')
     const [selectedEvent, setSelectedEvent] = useState<EventDto | null>(null)
     const [detailOpen, setDetailOpen] = useState(false)
     const [formOpen, setFormOpen] = useState(false)
@@ -39,6 +43,8 @@ export function EventsTable({ onlyMine = false }: EventsTableProps) {
         eventsApi.getAll({
             title: filterTitle || undefined,
             creatorId: onlyMine ? authUser?.id : undefined,
+            dateFrom: filterDateFrom || undefined,
+            dateTo: filterDateTo || undefined,
             page,
             limit,
         }).then((res) => {
@@ -49,7 +55,7 @@ export function EventsTable({ onlyMine = false }: EventsTableProps) {
 
     useEffect(() => {
         loadEvents()
-    }, [page, filterTitle, onlyMine])
+    }, [page, filterTitle, onlyMine, filterDateFrom, filterDateTo, initialDateFrom, initialDateTo])
 
     async function handleJoin(event: EventDto) {
         if (!authUser) return
@@ -149,14 +155,28 @@ export function EventsTable({ onlyMine = false }: EventsTableProps) {
     return (
         <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', gap: '12px' }}>
-                <input
-                    style={inputStyle}
-                    placeholder="Buscar por título..."
-                    value={filterTitle}
-                    onChange={(e) => setFilterTitle(e.target.value)}
-                    onBlur={() => setPage(1)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') { setPage(1); loadEvents() } }}
-                />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', gap: '12px' }}>
+                    <input
+                        style={inputStyle}
+                        placeholder="Buscar por título..."
+                        value={filterTitle}
+                        onChange={(e) => setFilterTitle(e.target.value)}
+                        onBlur={() => setPage(1)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { setPage(1); loadEvents() } }}
+                    />
+                    <input
+                        style={inputStyle}
+                        type="date"
+                        value={filterDateFrom}
+                        onChange={(e) => { setFilterDateFrom(e.target.value); setPage(1) }}
+                    />
+                    <input
+                        style={inputStyle}
+                        type="date"
+                        value={filterDateTo}
+                        onChange={(e) => { setFilterDateTo(e.target.value); setPage(1) }}
+                    />
+                </div>
                 {onlyMine && (
                     <Button variant="primary" onClick={() => { setEditEvent(null); setFormOpen(true) }}>
                         Nuevo evento

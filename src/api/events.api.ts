@@ -2,7 +2,7 @@ import apiClient from './client';
 import type { EventDto, PaginatedResponse } from '../types';
 
 export const eventsApi = {
-    getAll: (params: { title?: string; creatorId?: number; page?: number; limit?: number }) =>
+    getAll: (params: { title?: string; creatorId?: number; dateFrom?: string; dateTo?: string; page?: number; limit?: number }) =>
         apiClient.get<PaginatedResponse<EventDto>>('/events', { params }).then((r) => r.data),
 
     getById: (id: number) =>

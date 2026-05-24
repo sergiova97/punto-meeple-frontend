@@ -3,5 +3,5 @@ import {LoansTable} from "../../components/loans/LoansTable.tsx";
 
 export default function MyLoansPage() {
     const authUser = useAuthStore((state) => state.user)
-    return <LoansTable userId={authUser?.id} showUserColumn={false} />
+    return <LoansTable userId={authUser?.id} showUserColumn={false} showActions={true} />
 }

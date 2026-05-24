@@ -15,6 +15,9 @@ export const loansApi = {
     }) =>
         apiClient.get<PaginatedResponse<LoanDto>>('/loans', { params }).then((r) => r.data),
 
+    getById: (id: number) =>
+        apiClient.get<LoanDto>(`/loans/${id}`).then((r) => r.data),
+
     create: (data: { userId: number; gameId: number; startDate: string; endDate: string }) =>
         apiClient.post<LoanDto>('/loans', data).then((r) => r.data),
 

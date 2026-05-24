@@ -3,7 +3,6 @@ import { loansApi } from '../../api/loans.api';
 import { Table } from '../ui/Table';
 import { Pagination } from '../ui/Pagination';
 import { Badge } from '../ui/Badge';
-import { useAuthStore } from '../../store/auth.store';
 import type { LoanDto, LoanStatus } from '../../types';
 
 const STATUS_BADGE: Record<LoanStatus, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'neutral' }> = {
@@ -16,9 +15,10 @@ const STATUS_BADGE: Record<LoanStatus, { label: string; variant: 'success' | 'wa
 interface LoansTableProps {
     userId?: number
     showUserColumn?: boolean
+    showActions?: boolean
 }
 
-export function LoansTable({ userId, showUserColumn = true }: LoansTableProps) {
+export function LoansTable({ userId, showUserColumn = true, showActions = false }: LoansTableProps) {
     const [loans, setLoans] = useState<LoanDto[]>([])
     const [total, setTotal] = useState(0)
     const [page, setPage] = useState(1)
@@ -29,8 +29,6 @@ export function LoansTable({ userId, showUserColumn = true }: LoansTableProps) {
     const [filterStatus, setFilterStatus] = useState('')
 
     const limit = 10
-    const authUser = useAuthStore((state) => state.user)
-    const canChangeStatus = authUser?.roles.some((r) => r.name === 'ADMIN' || r.name === 'BIBLIOTECARIO')
 
     function loadLoans() {
         loansApi.getAll({
@@ -79,7 +77,7 @@ export function LoansTable({ userId, showUserColumn = true }: LoansTableProps) {
                 return <Badge variant={variant}>{label}</Badge>
             },
         },
-        ...(canChangeStatus ? [{
+        ...(showActions ? [{
             label: 'Acciones',
             render: (l: LoanDto) => (
                 <div style={{ display: 'flex', gap: '6px' }} onClick={(e) => e.stopPropagation()}>

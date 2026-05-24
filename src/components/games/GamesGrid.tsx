@@ -7,6 +7,7 @@ import { Pagination } from '../ui/Pagination';
 import { Button } from '../ui/Button';
 import { useAuthStore } from '../../store/auth.store';
 import type { Game, GameType } from '../../types';
+import {config} from "../../config.ts";
 
 interface GamesGridProps {
     gameType: GameType
@@ -25,7 +26,7 @@ export function GamesGrid({ gameType }: GamesGridProps) {
     const limit = 12
 
     const authUser = useAuthStore((state) => state.user)
-    const canCreate = authUser?.roles.some((r) => r.name === 'ADMIN' || r.name === 'BIBLIOTECARIO')
+    const canCreate = authUser?.roles.some((r) => r.name === config.roleAdmin || r.name === config.roleLibrarian)
 
     function loadGames() {
         gamesApi.getAll({

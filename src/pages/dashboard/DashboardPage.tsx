@@ -223,12 +223,7 @@ export default function DashboardPage() {
                 </div>
             )}
 
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'auto 1fr',
-                gap: '24px',
-                alignItems: 'start',
-            }}>
+            <div className="dashboard-grid">
                 <Calendar />
 
                 <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid var(--border)', padding: '20px' }}>

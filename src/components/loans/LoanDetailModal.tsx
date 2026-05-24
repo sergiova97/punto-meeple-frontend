@@ -1,6 +1,6 @@
-import { Modal } from '../ui/Modal'
-import { Badge } from '../ui/Badge'
-import type { LoanDto, LoanStatus } from '../../types'
+import { Modal } from '../ui/Modal';
+import { Badge } from '../ui/Badge';
+import type { LoanDto, LoanStatus } from '../../types';
 import {useAuthStore} from "../../store/auth.store.ts";
 import {loansApi} from "../../api/loans.api.ts";
 import {Button} from "../ui/Button.tsx";

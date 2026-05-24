@@ -22,9 +22,9 @@ export default function UsersPage() {
     const [createOpen, setCreateOpen] = useState(false)
     const limit = 10
     const navigate = useNavigate()
-    const user_auth = useAuthStore((state) => state.user)
+    const authUser = useAuthStore((state) => state.user)
 
-    const canCreate = user_auth?.roles.some((r) => r.name === config.roleAdmin)
+    const canCreate = authUser?.roles.some((r) => r.name === config.roleAdmin)
 
     function loadUsers() {
         usersApi.getAll(page, limit).then((res) => {
@@ -37,7 +37,7 @@ export default function UsersPage() {
     }, [page])
 
     const totalPages = Math.ceil(total / limit)
-console.log(user_auth)
+
     return (
         <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>

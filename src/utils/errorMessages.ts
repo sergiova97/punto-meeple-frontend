@@ -5,6 +5,7 @@ const ERROR_MAP: Record<string, string> = {
     // Users
     'User not found': 'Usuario no encontrado',
     'A user already exists with this email': 'Ya hay un usuario dado de alta con este correo',
+    'Current password is incorrect': 'La contraseña actual no es correcta',
 
     // Roles
     'Some roles do not exist': 'Algunos roles no existen',

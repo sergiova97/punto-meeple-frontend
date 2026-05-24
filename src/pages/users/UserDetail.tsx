@@ -7,21 +7,28 @@ import { useAuthStore } from '../../store/auth.store';
 import {Button} from "../../components/ui/Button.tsx";
 import {UserEditModal} from "../../components/users/UserEditModal.tsx";
 import {UserRolesModal} from "../../components/users/UserRolesModal.tsx";
+import {ChangePasswordModal} from "../../components/users/ChangePasswordModal.tsx";
 
 export default function UserDetail() {
+    const authUser = useAuthStore((state) => state.user)
+
     const { id } = useParams()
     const [user, setUser] = useState<User | null>(null)
     const [editOpen, setEditOpen] = useState(false)
     const [rolesOpen, setRolesOpen] = useState(false)
     const [deleting, setDeleting] = useState(false)
+    const [changePasswordOpen, setChangePasswordOpen] = useState(false)
+    const [resetPasswordOpen, setResetPasswordOpen] = useState(false)
+
     const navigate = useNavigate()
 
-    const user_auth = useAuthStore((state) => state.user)
     const canEdit =
-        user_auth?.id === user?.id ||
-        user_auth?.roles.some((r) => r.name === config.roleAdmin)
-    const canEditRoles = user_auth?.roles.some((r) => r.name === config.roleAdmin)
-    const canDelete = user_auth?.roles.some((r) => r.name === config.roleAdmin)
+        authUser?.id === user?.id ||
+        authUser?.roles.some((r) => r.name === config.roleAdmin)
+    const canEditRoles = authUser?.roles.some((r) => r.name === config.roleAdmin)
+    const canDelete = authUser?.roles.some((r) => r.name === config.roleAdmin)
+    const canResetPassword = authUser?.roles.some((r) => r.name === config.roleAdmin)
+    const canChangePassword = authUser?.id === user?.id
 
     async function handleDelete() {
         if (!user || !window.confirm(`¿Seguro que quieres desactivar a ${user.name} ${user.surname}?`)) return
@@ -47,6 +54,16 @@ export default function UserDetail() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
                 <h1>{user.name} {user.surname}</h1>
                 <div style={{ display: 'flex', gap: '12px' }}>
+                    {canChangePassword && (
+                        <Button variant="secondary" onClick={() => setChangePasswordOpen(true)}>
+                            Cambiar contraseña
+                        </Button>
+                    )}
+                    {canResetPassword && authUser?.id !== user?.id && (
+                        <Button variant="secondary" onClick={() => setResetPasswordOpen(true)}>
+                            Restablecer contraseña
+                        </Button>
+                    )}
                     {canEditRoles && (
                         <Button variant="primary" onClick={() => setRolesOpen(true)}>
                             Asignar roles
@@ -138,6 +155,20 @@ export default function UserDetail() {
                     </Button>
                 </div>
             )}
+
+            <ChangePasswordModal
+                userId={user.id}
+                open={changePasswordOpen}
+                onClose={() => setChangePasswordOpen(false)}
+                isReset={false}
+            />
+
+            <ChangePasswordModal
+                userId={user.id}
+                open={resetPasswordOpen}
+                onClose={() => setResetPasswordOpen(false)}
+                isReset={true}
+            />
 
             <UserEditModal
                 user={user}

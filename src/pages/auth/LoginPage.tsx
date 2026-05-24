@@ -12,7 +12,6 @@ export default function LoginPage() {
     const [error, setError] = useState('')
 
     async function handleSubmit() {
-        console.log('handleSubmit llamado')
         setError('')
         setLoading(true)
 

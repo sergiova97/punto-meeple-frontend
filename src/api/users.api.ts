@@ -47,4 +47,10 @@ export const usersApi = {
 
     deactivate: (id: number) =>
         apiClient.patch<{ success: boolean }>(`/users/${id}/deactivate`).then((r) => r.data),
+
+    changePassword: (id: number, data: { currentPassword: string; newPassword: string }) =>
+        apiClient.patch(`/users/${id}/change-password`, data).then((r) => r.data),
+
+    resetPassword: (id: number, data: { newPassword: string }) =>
+        apiClient.patch(`/users/${id}/reset-password`, data).then((r) => r.data),
 }

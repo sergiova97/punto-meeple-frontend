@@ -28,7 +28,7 @@ export function LoanDetailModal({ loan, open, onClose, onSuccess }: LoanDetailMo
     const isOwner = authUser?.id === loan.userId
 
     async function handleStatusChange(status: LoanStatus) {
-        if (!authUser) return
+        if (!authUser || !loan) return
         if (!window.confirm(`¿Seguro que quieres cambiar el estado a ${STATUS_BADGE[status].label}?`)) return
         await loansApi.updateStatus(loan.id, status, authUser.id)
         onSuccess?.()

@@ -4,6 +4,7 @@ import { Table } from '../ui/Table';
 import { Pagination } from '../ui/Pagination';
 import { Badge } from '../ui/Badge';
 import type { LoanDto, LoanStatus } from '../../types';
+import {useAuthStore} from "../../store/auth.store.ts";
 
 const STATUS_BADGE: Record<LoanStatus, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'neutral' }> = {
     PENDING:  { label: 'Pendiente', variant: 'warning' },
@@ -19,6 +20,8 @@ interface LoansTableProps {
 }
 
 export function LoansTable({ userId, showUserColumn = true, showActions = false }: LoansTableProps) {
+    const authUser = useAuthStore((state) => state.user)
+
     const [loans, setLoans] = useState<LoanDto[]>([])
     const [total, setTotal] = useState(0)
     const [page, setPage] = useState(1)
@@ -51,8 +54,9 @@ export function LoansTable({ userId, showUserColumn = true, showActions = false 
     }, [page, filterStatus, filterStartDate, filterEndDate])
 
     async function handleStatusChange(id: number, status: LoanStatus) {
+        if (!authUser) return
         if (!window.confirm(`¿Seguro que quieres cambiar el estado a ${STATUS_BADGE[status].label}?`)) return
-        await loansApi.updateStatus(id, status)
+        await loansApi.updateStatus(id, status, authUser.id)
         loadLoans()
     }
 

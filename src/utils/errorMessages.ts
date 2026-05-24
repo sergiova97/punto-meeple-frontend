@@ -22,6 +22,8 @@ const ERROR_MAP: Record<string, string> = {
     'Some fees not found': 'Alguno cuota no se ha encontrado',
     'Payment not found': 'Pago no encontrado',
     'Some fees are not in a payable state': 'Algunas cuotas se encuentran en un estado que no permite pagarlas',
+    'Only pending fees can be deleted': 'Solo pueden borrarse cuotas en estado PENDIENTE',
+    'This fee has a payment. It cannot be deleted. Please inform your administrator': 'La cuota que intenta eliminar tiene un pago asociado, por favor, contacte con el administrador',
 
     // Events
     'Event not found': 'Evento no encontrado',

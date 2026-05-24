@@ -13,4 +13,7 @@ export const membershipFeesApi = {
 
     generateFees: (data: { userIds: number[]; periods: string[]; price: number }) =>
         apiClient.post('/membership-fees/generate-fees', data).then((r) => r.data),
+
+    delete: (id: number) =>
+        apiClient.delete(`/membership-fees/${id}`).then((r) => r.data),
 }

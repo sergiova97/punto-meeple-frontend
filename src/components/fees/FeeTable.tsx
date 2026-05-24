@@ -3,6 +3,8 @@ import { Table } from '../ui/Table.tsx'
 import { Pagination } from '../ui/Pagination.tsx'
 import { Badge } from '../ui/Badge.tsx'
 import type { MembershipFeeDto, MembershipFeeStatus } from '../../types'
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faTrash} from "@fortawesome/free-solid-svg-icons";
 
 interface FeeTableProps {
     fees: MembershipFeeDto[]
@@ -14,6 +16,7 @@ interface FeeTableProps {
     showUserColumn?: boolean
     showSelectAll?: boolean
     resetSelection?: boolean
+    onDelete?: (fee: MembershipFeeDto) => void
 }
 
 const STATUS_BADGE: Record<MembershipFeeStatus, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'neutral' }> = {
@@ -25,7 +28,7 @@ const STATUS_BADGE: Record<MembershipFeeStatus, { label: string; variant: 'succe
 
 const PAYABLE_STATUSES: MembershipFeeStatus[] = ['PENDING', 'OVERDUE']
 
-export function FeeTable({ fees, total, page, onPageChange, onRowClick, onSelectionChange, showUserColumn = false, showSelectAll = false, resetSelection = false }: FeeTableProps) {
+export function FeeTable({ fees, total, page, onPageChange, onRowClick, onSelectionChange, showUserColumn = false, showSelectAll = false, resetSelection = false, onDelete }: FeeTableProps) {
     const [selectedIds, setSelectedIds] = useState<number[]>([])
     const limit = 10
     const totalPages = Math.ceil(total / limit)
@@ -78,6 +81,19 @@ export function FeeTable({ fees, total, page, onPageChange, onRowClick, onSelect
                 return <Badge variant={variant}>{label}</Badge>
             },
         },
+        ...(onDelete ? [{
+            label: '',
+            render: (fee: MembershipFeeDto) => (
+                fee.status === 'PENDING' ? (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onDelete(fee) }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-error)', padding: '4px' }}
+                    >
+                        <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                ) : null
+            ),
+        }] : []),
     ]
 
     return (

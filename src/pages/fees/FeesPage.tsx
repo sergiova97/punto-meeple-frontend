@@ -6,8 +6,12 @@ import { PaymentModal } from '../../components/payments/PaymentModal.tsx'
 import type { MembershipFeeDto, MembershipFeeStatus } from '../../types'
 import {Button} from "../../components/ui/Button.tsx";
 import {GenerateFeesModal} from "../../components/fees/GenerateFeesModal.tsx";
+import {config} from "../../config.ts";
+import {useAuthStore} from "../../store/auth.store.ts";
 
 export default function FeesPage() {
+    const authUser = useAuthStore((state) => state.user)
+
     const [fees, setFees] = useState<MembershipFeeDto[]>([])
     const [total, setTotal] = useState(0)
     const [page, setPage] = useState(1)
@@ -24,6 +28,8 @@ export default function FeesPage() {
     const [filterUserName, setFilterUserName] = useState('')
 
     const [resetSelection, setResetSelection] = useState(false)
+
+    const canDelete = authUser?.roles.some((r) => r.name === config.roleAdmin || r.name === config.roleTreasurer)
 
     const limit = 10
 
@@ -47,6 +53,16 @@ export default function FeesPage() {
     async function handleStatusChange(ids: number[], status: MembershipFeeStatus) {
         await membershipFeesApi.updateStatus(ids, status)
         loadFees()
+    }
+
+    async function handleDelete(fee: MembershipFeeDto) {
+        if (!window.confirm(`¿Seguro que quieres eliminar la cuota de ${fee.userName} - ${fee.period}?`)) return
+        try {
+            await membershipFeesApi.delete(fee.id)
+            loadFees()
+        } catch (err: any) {
+            alert(err.response?.data?.message ?? 'Error al eliminar la cuota.')
+        }
     }
 
     const inputStyle: React.CSSProperties = {
@@ -110,6 +126,7 @@ export default function FeesPage() {
                 onRowClick={(fee) => { setSelectedFee(fee); setDetailOpen(true) }}
                 onSelectionChange={setSelectedFeeIds}
                 resetSelection={resetSelection}
+                onDelete={canDelete ? handleDelete : undefined}
             />
 
             <FeeDetailModal

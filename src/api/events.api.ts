@@ -5,6 +5,9 @@ export const eventsApi = {
     getAll: (params: { title?: string; creatorId?: number; page?: number; limit?: number }) =>
         apiClient.get<PaginatedResponse<EventDto>>('/events', { params }).then((r) => r.data),
 
+    getById: (id: number) =>
+        apiClient.get<EventDto>(`/events/${id}`).then((r) => r.data),
+
     create: (data: {
         userId: number
         title: string

@@ -15,6 +15,7 @@ import LoansPage from "../pages/loans/LoansPage.tsx";
 import MyLoansPage from "../pages/loans/MyLoansPage.tsx";
 import EventsPage from "../pages/events/EventsPage.tsx";
 import MyEventsPage from "../pages/events/MyEventsPage.tsx";
+import DashboardPage from "../pages/dashboard/DashboardPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -29,7 +30,7 @@ const router = createBrowserRouter([
                 element: <AppShell />,
                 children: [
                     { index: true, element: <Navigate to="/dashboard" replace /> },
-                    { path: 'dashboard', element: <div>Dashboard</div> },
+                    { path: 'dashboard', element: <DashboardPage /> },
                     { path: 'users', element: <UsersPage /> },
                     { path: 'users/:id', element: <UserDetail /> },
                     {

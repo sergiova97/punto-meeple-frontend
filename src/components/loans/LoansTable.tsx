@@ -11,6 +11,7 @@ const STATUS_BADGE: Record<LoanStatus, { label: string; variant: 'success' | 'wa
     ACTIVE:   { label: 'Activo',    variant: 'success' },
     RETURNED: { label: 'Devuelto',  variant: 'neutral' },
     OVERDUE:  { label: 'Vencido',   variant: 'danger' },
+    CANCELLED:  { label: 'Cancelado',   variant: 'danger' },
 }
 
 interface LoansTableProps {
@@ -86,21 +87,21 @@ export function LoansTable({ userId, showUserColumn = true, showActions = false 
             render: (l: LoanDto) => (
                 <div style={{ display: 'flex', gap: '6px' }} onClick={(e) => e.stopPropagation()}>
                     {l.status === 'PENDING' && (
-                        <button onClick={() => handleStatusChange(l.id, 'ACTIVE')}
-                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-success)', fontWeight: 600 }}>
-                            Activar
-                        </button>
+                        <>
+                            <button onClick={() => handleStatusChange(l.id, 'ACTIVE')}
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-success)', fontWeight: 600 }}>
+                                Activar
+                            </button>
+                            <button onClick={() => handleStatusChange(l.id, 'RETURNED')}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-error)', fontWeight: 600 }}>
+                                Cancelar
+                            </button>
+                        </>
                     )}
                     {(l.status === 'ACTIVE' || l.status === 'OVERDUE') && (
                         <button onClick={() => handleStatusChange(l.id, 'RETURNED')}
                                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-primary)', fontWeight: 600 }}>
                             Devuelto
-                        </button>
-                    )}
-                    {l.status === 'PENDING' && (
-                        <button onClick={() => handleStatusChange(l.id, 'RETURNED')}
-                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-error)', fontWeight: 600 }}>
-                            Cancelar
                         </button>
                     )}
                 </div>

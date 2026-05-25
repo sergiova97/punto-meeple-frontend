@@ -107,7 +107,7 @@ export interface Game {
     mechanics: GameMechanic[]
 }
 
-export type LoanStatus = 'PENDING' | 'ACTIVE' | 'RETURNED' | 'OVERDUE'
+export type LoanStatus = 'PENDING' | 'ACTIVE' | 'RETURNED' | 'OVERDUE' | 'CANCELLED'
 
 export interface LoanDto {
     id: number

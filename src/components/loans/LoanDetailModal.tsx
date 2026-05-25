@@ -17,6 +17,7 @@ const STATUS_BADGE: Record<LoanStatus, { label: string; variant: 'success' | 'wa
     ACTIVE:   { label: 'Activo',    variant: 'success' },
     RETURNED: { label: 'Devuelto',  variant: 'neutral' },
     OVERDUE:  { label: 'Vencido',   variant: 'danger' },
+    CANCELLED:  { label: 'Cancelado',   variant: 'danger' },
 }
 
 export function LoanDetailModal({ loan, open, onClose, onSuccess }: LoanDetailModalProps) {
@@ -68,7 +69,7 @@ export function LoanDetailModal({ loan, open, onClose, onSuccess }: LoanDetailMo
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '8px' }}>
                         {loan.status === 'PENDING' && (
                             <>
-                                <Button variant="danger" onClick={() => handleStatusChange('RETURNED')}>
+                                <Button variant="danger" onClick={() => handleStatusChange('CANCELLED')}>
                                     Cancelar
                                 </Button>
                                 <Button variant="primary" onClick={() => handleStatusChange('ACTIVE')}>

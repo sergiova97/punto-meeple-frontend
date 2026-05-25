@@ -17,6 +17,7 @@ const ERROR_MAP: Record<string, string> = {
     'Loan not found': 'Pŕestamo no encontrado',
     'This game is already on loan for the requested dates': 'Este juego ya está en préstamo en las fechas solicitadas',
     'End date must be after start date': 'La fecha de finalización debe ser posterior a la de comienzo',
+    'Loan can only be activated between start and end date': 'Solo se pueden activar préstamos entre la fecha de inicio y la de fin',
 
     // Fees
     'Membership fee not found': 'Cuota no encontrada',

@@ -57,8 +57,12 @@ export function LoansTable({ userId, showUserColumn = true, showActions = false 
     async function handleStatusChange(id: number, status: LoanStatus) {
         if (!authUser) return
         if (!window.confirm(`¿Seguro que quieres cambiar el estado a ${STATUS_BADGE[status].label}?`)) return
-        await loansApi.updateStatus(id, status, authUser.id)
-        loadLoans()
+        try {
+            await loansApi.updateStatus(id, status, authUser.id)
+            loadLoans()
+        } catch (err: any) {
+            alert(err.response?.data?.message ?? 'Error al actualizar el estado.')
+        }
     }
 
     const inputStyle: React.CSSProperties = {
@@ -92,7 +96,7 @@ export function LoansTable({ userId, showUserColumn = true, showActions = false 
                                     style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-success)', fontWeight: 600 }}>
                                 Activar
                             </button>
-                            <button onClick={() => handleStatusChange(l.id, 'RETURNED')}
+                            <button onClick={() => handleStatusChange(l.id, 'CANCELLED')}
                                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-error)', fontWeight: 600 }}>
                                 Cancelar
                             </button>

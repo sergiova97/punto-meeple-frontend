@@ -4,6 +4,7 @@ import type { LoanDto, LoanStatus } from '../../types';
 import {useAuthStore} from "../../store/auth.store.ts";
 import {loansApi} from "../../api/loans.api.ts";
 import {Button} from "../ui/Button.tsx";
+import {useState} from "react";
 
 interface LoanDetailModalProps {
     loan: LoanDto | null
@@ -23,6 +24,8 @@ const STATUS_BADGE: Record<LoanStatus, { label: string; variant: 'success' | 'wa
 export function LoanDetailModal({ loan, open, onClose, onSuccess }: LoanDetailModalProps) {
     const authUser = useAuthStore((state) => state.user)
 
+    const [error, setError] = useState('')
+
     if (!loan) return null
 
     const { label, variant } = STATUS_BADGE[loan.status]
@@ -31,9 +34,14 @@ export function LoanDetailModal({ loan, open, onClose, onSuccess }: LoanDetailMo
     async function handleStatusChange(status: LoanStatus) {
         if (!authUser || !loan) return
         if (!window.confirm(`¿Seguro que quieres cambiar el estado a ${STATUS_BADGE[status].label}?`)) return
-        await loansApi.updateStatus(loan.id, status, authUser.id)
-        onSuccess?.()
-        onClose()
+        setError('')
+        try {
+            await loansApi.updateStatus(loan.id, status, authUser.id)
+            onSuccess?.()
+            onClose()
+        } catch (err: any) {
+            setError(err.response?.data?.message ?? 'Error al actualizar el estado.')
+        }
     }
 
     return (
@@ -66,23 +74,34 @@ export function LoanDetailModal({ loan, open, onClose, onSuccess }: LoanDetailMo
                     )}
                 </div>
                 {isOwner && (
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '8px' }}>
-                        {loan.status === 'PENDING' && (
-                            <>
-                                <Button variant="danger" onClick={() => handleStatusChange('CANCELLED')}>
-                                    Cancelar
-                                </Button>
-                                <Button variant="primary" onClick={() => handleStatusChange('ACTIVE')}>
-                                    Activar
-                                </Button>
-                            </>
+                    <>
+                        {error && (
+                            <div style={{
+                                fontSize: '0.85rem', color: '#991b1b',
+                                background: '#fee2e2', border: '1px solid #fca5a5',
+                                padding: '10px 14px', borderRadius: '8px', marginTop: '8px',
+                            }}>
+                                {error}
+                            </div>
                         )}
-                        {(loan.status === 'ACTIVE' || loan.status === 'OVERDUE') && (
-                            <Button variant="primary" onClick={() => handleStatusChange('RETURNED')}>
-                                Devolver
-                            </Button>
-                        )}
-                    </div>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '8px' }}>
+                            {loan.status === 'PENDING' && (
+                                <>
+                                    <Button variant="danger" onClick={() => handleStatusChange('CANCELLED')}>
+                                        Cancelar
+                                    </Button>
+                                    <Button variant="primary" onClick={() => handleStatusChange('ACTIVE')}>
+                                        Activar
+                                    </Button>
+                                </>
+                            )}
+                            {(loan.status === 'ACTIVE' || loan.status === 'OVERDUE') && (
+                                <Button variant="primary" onClick={() => handleStatusChange('RETURNED')}>
+                                    Devolver
+                                </Button>
+                            )}
+                        </div>
+                    </>
                 )}
             </div>
         </Modal>

@@ -1,73 +1,95 @@
-# React + TypeScript + Vite
+# 🎲 Punto Meeple — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación web SPA (Single Page Application) del proyecto Punto Meeple, una herramienta de gestión para asociaciones de juegos de mesa y rol. Desarrollada con React, TypeScript y Vite.
 
-Currently, two official plugins are available:
+> ⚠️ Este repositorio está pensado para ejecutarse dentro del entorno Docker del proyecto. Consulta el [repositorio de Docker](https://github.com/sergiova97/punto-meeple-docker) para las instrucciones de instalación completas.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🧱 Stack tecnológico
 
-## React Compiler
+- **React 19** — biblioteca de componentes UI
+- **TypeScript** — tipado estático
+- **Vite** — bundler y servidor de desarrollo
+- **React Router** — enrutamiento client-side
+- **Zustand** — gestión de estado global (autenticación)
+- **Axios** — cliente HTTP con interceptores JWT
+- **Tailwind CSS** — utilidades de estilos
+- **FontAwesome** — iconografía
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📁 Estructura del proyecto
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── api/            # Llamadas a la API REST por módulo
+├── components/
+│   ├── ui/         # Componentes reutilizables (Table, Modal, Badge, Button, Pagination)
+│   ├── layout/     # AppShell, Sidebar, TopBar, BottomBar, NavSections
+│   ├── dashboard/  # Calendario interactivo
+│   ├── fees/       # Componentes de cuotas
+│   ├── games/      # Componentes de juegos (GameCard, GamesGrid, modales)
+│   ├── loans/      # Componentes de préstamos
+│   └── events/     # Componentes de eventos
+├── pages/          # Páginas por módulo (auth, dashboard, users, fees, games, loans, events)
+├── router/         # Configuración de rutas y PrivateRoute
+├── store/          # Estado global con Zustand (auth)
+├── hooks/          # Hooks reutilizables (useIsMobile, useDebounce)
+├── types/          # Tipos e interfaces TypeScript
+├── utils/          # Utilidades (logger, routeNames, errorMessages)
+└── config.ts       # Configuración global (URL de la API)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 📋 Requisitos
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+El proyecto se ejecuta dentro de Docker. Consulta el [repositorio de Docker](https://github.com/sergiova97/punto-meeple-docker) para los requisitos y la instalación del entorno.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Para desarrollo local sin Docker:
+- Node.js >= 18
+- npm
+
+## 📥 Instalación
+
+Sigue las instrucciones del [repositorio de Docker](https://github.com/sergiova97/punto-meeple-docker). Una vez levantado el entorno completo con frontend, accede al contenedor:
+
+```bash
+docker compose exec frontend bash
 ```
+
+Instala las dependencias:
+
+```bash
+npm install
+```
+
+Levanta el servidor de desarrollo:
+
+```bash
+npm run dev
+```
+
+La aplicación estará disponible en `http://localhost:5173`.
+
+## 🚀 Uso
+
+La aplicación se comunica con el backend a través de un proxy configurado en Vite (`/api` → `http://backend:3000`). Asegúrate de que el backend está levantado y las migraciones ejecutadas antes de usar el frontend.
+
+El acceso a la aplicación requiere usuario y contraseña. El registro de nuevos socios es responsabilidad del administrador.
+
+## 📖 Módulos de la aplicación
+
+| Módulo | Ruta | Roles con acceso |
+|---|---|---|
+| Dashboard | `/dashboard` | Todos |
+| Socios | `/users`, `/users/:id` | ADMIN, RRHH |
+| Juegos de mesa | `/board-games` | Todos |
+| Libros de rol | `/rpg-books` | Todos |
+| Categorías y mecánicas | `/game-settings` | ADMIN, BIBLIOTECARIO |
+| Préstamos | `/loans` | Todos |
+| Mis préstamos | `/my-loans` | Todos |
+| Todas las cuotas | `/fees` | ADMIN, TESORERO |
+| Mis cuotas | `/my-fees` | Todos |
+| Revisión de pagos | `/payments` | ADMIN, TESORERO |
+| Todos los eventos | `/events` | Todos |
+| Mis eventos | `/my-events` | Todos |
+
+## 🔐 Autenticación
+
+La autenticación se gestiona mediante JWT. El token se almacena en `localStorage` bajo la clave `pm_token` y se adjunta automáticamente en todas las peticiones a la API mediante un interceptor de Axios. Si el token caduca o es inválido, el usuario es redirigido automáticamente a la página de login.

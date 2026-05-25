@@ -1,6 +1,9 @@
 import {NavSections} from "./NavSections.tsx";
+import {useNavigate} from "react-router-dom";
 
 export function Sidebar() {
+    const navigate = useNavigate()
+
     return (
         <aside
             style={{
@@ -14,6 +17,7 @@ export function Sidebar() {
             }}
         >
             <div
+                onClick={() => navigate('/dashboard')}
                 style={{
                     padding: '16px',
                     borderBottom: '1px solid var(--border)',

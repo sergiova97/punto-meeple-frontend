@@ -59,9 +59,17 @@ Instala las dependencias:
 npm install
 ```
 
+Crear el archivo .env y editar las variables de entorno
+
+```bash
+cp .env.dist .env
+```
+
+
 Levanta el servidor de desarrollo:
 
 ```bash
+npm run build
 npm run dev
 ```
 

@@ -6,6 +6,7 @@ import { gameCategoriesApi } from '../../api/game-categories.api';
 import { gameMechanicsApi } from '../../api/game-mechanics.api';
 import type { Game, GameCategory, GameMechanic, GameType } from '../../types';
 import {config} from "../../config.ts";
+import {SuccessModal} from "../ui/SuccessModal.tsx";
 
 interface GameCreateModalProps {
     open: boolean
@@ -28,6 +29,7 @@ export function GameCreateModal({ open, onClose, onSave, game, defaultType }: Ga
     const [mechanics, setMechanics] = useState<GameMechanic[]>([])
     const [imageFile, setImageFile] = useState<File | null>(null)
     const [imagePreview, setImagePreview] = useState<string | null>(null)
+    const [success, setSuccess] = useState(false)
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -93,13 +95,17 @@ export function GameCreateModal({ open, onClose, onSave, game, defaultType }: Ga
                 }
             }
 
-            onSave()
-            onClose()
+            setSuccess(true)
         } catch (err: any) {
             setError(err.response?.data?.message ?? 'Error al guardar el juego.')
         } finally {
             setLoading(false)
         }
+    }
+
+    function handleClose() {
+        setSuccess(false)
+        onClose()
     }
 
     const inputStyle: React.CSSProperties = {
@@ -129,121 +135,133 @@ export function GameCreateModal({ open, onClose, onSave, game, defaultType }: Ga
         : (defaultType === 'BOARD_GAME' ? 'Añadir juego' : 'Añadir libro de rol')
 
     return (
-        <Modal open={open} onClose={onClose} title={title} width={560}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                <div style={{
-                    width: '100%',
-                    aspectRatio: '16/9',
-                    borderRadius: '8px',
-                    overflow: 'hidden',
-                    background: 'var(--bg-app)',
-                    border: '1px solid var(--border)',
-                }}>
-                    <img
-                        src={imagePreview ?? (game?.image ? `${config.apiUrl}/uploads/${game.image}` : (defaultType === 'BOARD_GAME' ? '/default-board-game.png' : '/default-rpg.png'))}
-                        alt="Imagen del juego"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                </div>
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                        const file = e.target.files?.[0]
-                        if (file) {
-                            setImageFile(file)
-                            setImagePreview(URL.createObjectURL(file))
-                        }
-                    }}
-                />
-            </div>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                    <div style={{ gridColumn: '1 / -1' }}>
-                        <label style={labelStyle}>Nombre</label>
-                        <input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} required />
-                    </div>
-                    <div style={{ gridColumn: '1 / -1' }}>
-                        <label style={labelStyle}>Editorial</label>
-                        <input style={inputStyle} value={publisher} onChange={(e) => setPublisher(e.target.value)} required />
-                    </div>
-                    <div>
-                        <label style={labelStyle}>Mín. jugadores</label>
-                        <input style={inputStyle} type="number" min="1" value={minPlayers} onChange={(e) => setMinPlayers(e.target.value)} />
-                    </div>
-                    <div>
-                        <label style={labelStyle}>Máx. jugadores</label>
-                        <input style={inputStyle} type="number" min="1" value={maxPlayers} onChange={(e) => setMaxPlayers(e.target.value)} />
-                    </div>
-                    <div style={{ gridColumn: '1 / -1' }}>
-                        <label style={labelStyle}>Duración (min)</label>
-                        <input style={inputStyle} type="number" min="1" value={duration} onChange={(e) => setDuration(e.target.value)} />
-                    </div>
-                    <div style={{ gridColumn: '1 / -1' }}>
-                        <label style={labelStyle}>Descripción</label>
-                        <textarea
-                            style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }}
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            required
+        <>
+            <Modal open={open && !success} onClose={handleClose} title={title} width={560}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                        width: '100%',
+                        aspectRatio: '16/9',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        background: 'var(--bg-app)',
+                        border: '1px solid var(--border)',
+                    }}>
+                        <img
+                            src={imagePreview ?? (game?.image ? `${config.apiUrl}/uploads/${game.image}` : (defaultType === 'BOARD_GAME' ? '/default-board-game.png' : '/default-rpg.png'))}
+                            alt="Imagen del juego"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
                     </div>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) {
+                                setImageFile(file)
+                                setImagePreview(URL.createObjectURL(file))
+                            }
+                        }}
+                    />
                 </div>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-                <div>
-                    <label style={labelStyle}>Categorías</label>
-                    <div style={{
-                        maxHeight: '120px',
-                        overflowY: 'auto',
-                        border: '1px solid var(--border)',
-                        borderRadius: '6px',
-                        padding: '4px',
-                    }}>
-                        {categories.map((c) => (
-                            <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', cursor: 'pointer', fontSize: '0.875rem' }}>
-                                <input
-                                    type="checkbox"
-                                    checked={categoryIds.includes(c.id)}
-                                    onChange={() => toggleItem(c.id, categoryIds, setCategoryIds)}
-                                />
-                                {c.name}
-                            </label>
-                        ))}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        <div style={{ gridColumn: '1 / -1' }}>
+                            <label style={labelStyle}>Nombre</label>
+                            <input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} required />
+                        </div>
+                        <div style={{ gridColumn: '1 / -1' }}>
+                            <label style={labelStyle}>Editorial</label>
+                            <input style={inputStyle} value={publisher} onChange={(e) => setPublisher(e.target.value)} required />
+                        </div>
+                        <div>
+                            <label style={labelStyle}>Mín. jugadores</label>
+                            <input style={inputStyle} type="number" min="1" value={minPlayers} onChange={(e) => setMinPlayers(e.target.value)} />
+                        </div>
+                        <div>
+                            <label style={labelStyle}>Máx. jugadores</label>
+                            <input style={inputStyle} type="number" min="1" value={maxPlayers} onChange={(e) => setMaxPlayers(e.target.value)} />
+                        </div>
+                        <div style={{ gridColumn: '1 / -1' }}>
+                            <label style={labelStyle}>Duración (min)</label>
+                            <input style={inputStyle} type="number" min="1" value={duration} onChange={(e) => setDuration(e.target.value)} />
+                        </div>
+                        <div style={{ gridColumn: '1 / -1' }}>
+                            <label style={labelStyle}>Descripción</label>
+                            <textarea
+                                style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }}
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                required
+                            />
+                        </div>
                     </div>
-                </div>
 
-                <div>
-                    <label style={labelStyle}>Mecánicas</label>
-                    <div style={{
-                        maxHeight: '120px',
-                        overflowY: 'auto',
-                        border: '1px solid var(--border)',
-                        borderRadius: '6px',
-                        padding: '4px',
-                    }}>
-                        {mechanics.map((m) => (
-                            <label key={m.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', cursor: 'pointer', fontSize: '0.875rem' }}>
-                                <input
-                                    type="checkbox"
-                                    checked={mechanicIds.includes(m.id)}
-                                    onChange={() => toggleItem(m.id, mechanicIds, setMechanicIds)}
-                                />
-                                {m.name}
-                            </label>
-                        ))}
+                    <div>
+                        <label style={labelStyle}>Categorías</label>
+                        <div style={{
+                            maxHeight: '120px',
+                            overflowY: 'auto',
+                            border: '1px solid var(--border)',
+                            borderRadius: '6px',
+                            padding: '4px',
+                        }}>
+                            {categories.map((c) => (
+                                <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', cursor: 'pointer', fontSize: '0.875rem' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={categoryIds.includes(c.id)}
+                                        onChange={() => toggleItem(c.id, categoryIds, setCategoryIds)}
+                                    />
+                                    {c.name}
+                                </label>
+                            ))}
+                        </div>
                     </div>
-                </div>
 
-                {error && <p style={{ fontSize: '0.8rem', color: 'var(--color-error)' }}>{error}</p>}
+                    <div>
+                        <label style={labelStyle}>Mecánicas</label>
+                        <div style={{
+                            maxHeight: '120px',
+                            overflowY: 'auto',
+                            border: '1px solid var(--border)',
+                            borderRadius: '6px',
+                            padding: '4px',
+                        }}>
+                            {mechanics.map((m) => (
+                                <label key={m.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', cursor: 'pointer', fontSize: '0.875rem' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={mechanicIds.includes(m.id)}
+                                        onChange={() => toggleItem(m.id, mechanicIds, setMechanicIds)}
+                                    />
+                                    {m.name}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                    <Button variant="secondary" type="button" onClick={onClose}>Cancelar</Button>
-                    <Button variant="primary" type="submit" disabled={loading}>
-                        {loading ? 'Guardando...' : 'Guardar'}
-                    </Button>
-                </div>
-            </form>
-        </Modal>
+                    {error && <p style={{ fontSize: '0.8rem', color: 'var(--color-error)' }}>{error}</p>}
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                        <Button variant="secondary" type="button" onClick={onClose}>Cancelar</Button>
+                        <Button variant="primary" type="submit" disabled={loading}>
+                            {loading ? 'Guardando...' : 'Guardar'}
+                        </Button>
+                    </div>
+                </form>
+            </Modal>
+
+            <SuccessModal
+                open={success}
+                onClose={() => { onSave(); handleClose() }}
+                title={game ? '¡Juego actualizado correctamente!' : '¡Juego creado correctamente!'}
+                message={game
+                    ? `Los datos de "${name}" han sido actualizados.`
+                    : `"${name}" ha sido añadido a la biblioteca.`
+                }
+            />
+        </>
     )
 }

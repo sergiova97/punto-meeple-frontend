@@ -19,7 +19,7 @@ export function GameDetailModal({ game, open, onClose, onEdit }: GameDetailModal
     const [loanOpen, setLoanOpen] = useState(false)
 
     const authUser = useAuthStore((state) => state.user)
-    const canEdit = authUser?.roles.some((r) => r.name === 'ADMIN' || r.name === 'BIBLIOTECARIO')
+    const canEdit = authUser?.roles.some((r) => r.name === config.roleAdmin || r.name === config.roleLibrarian)
 
     if (!game) return null
 

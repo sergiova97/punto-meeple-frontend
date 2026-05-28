@@ -4,8 +4,7 @@ import type {User} from "../../types";
 import {usersApi} from "../../api/users.api.ts";
 import {membershipFeesApi} from "../../api/membership-fees.api.ts";
 import {Button} from "../ui/Button.tsx";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCheck} from "@fortawesome/free-solid-svg-icons";
+import {SuccessModal} from "../ui/SuccessModal.tsx";
 
 interface GenerateFeesModalProps {
     open: boolean
@@ -29,7 +28,6 @@ export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModa
     const [error, setError] = useState('')
 
     const [success, setSuccess] = useState(false)
-    const [generatedCount, setGeneratedCount] = useState(0)
 
     const allMonths = getAllMonths()
 
@@ -93,7 +91,6 @@ export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModa
                 periods: selectedPeriods,
                 price: +price,
             })
-            setGeneratedCount(result.created)
             setSuccess(true)
         } catch (err: any) {
             setError(err.response?.data?.message ?? 'Error al generar las cuotas.')
@@ -104,7 +101,10 @@ export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModa
 
     function handleClose() {
         setSuccess(false)
-        setGeneratedCount(0)
+        setSelectedPeriods([])
+        setSelectedUserIds([])
+        setPrice('')
+        setError('')
         onClose()
     }
 
@@ -121,26 +121,8 @@ export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModa
     const allPeriodsSelected = selectedPeriods.length === allMonths.length
 
     return (
-        <Modal open={open} onClose={onClose} title="Generar cuotas" width={520}>
-            {success ? (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', padding: '8px 0' }}>
-                    <div style={{
-                        width: '56px', height: '56px', borderRadius: '50%',
-                        background: '#d1fae5', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                        <FontAwesomeIcon icon={faCheck} style={{ color: '#065f46', width: '24px', height: '24px' }} />
-                    </div>
-                    <p style={{ textAlign: 'center', fontWeight: 600, color: 'var(--text-primary)' }}>
-                        ¡Cuotas generadas correctamente!
-                    </p>
-                    <p style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                        Se han generado {generatedCount} cuota{generatedCount !== 1 ? 's' : ''} correctamente.
-                    </p>
-                    <Button variant="primary" onClick={() => { onSuccess(); handleClose() }}>
-                        Cerrar
-                    </Button>
-                </div>
-            ) : (
+        <>
+            <Modal open={open} onClose={onClose} title="Generar cuotas" width={520}>
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <div>
                         <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', display: 'block' }}>
@@ -256,7 +238,14 @@ export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModa
                         </Button>
                     </div>
                 </form>
-            )}
-        </Modal>
+            </Modal>
+
+            <SuccessModal
+                open={success}
+                onClose={() => { onSuccess(); handleClose() }}
+                title="¡Cuotas generadas correctamente!"
+                message={`Se han generado las cuotas para ${selectedUserIds.length} socio${selectedUserIds.length !== 1 ? 's' : ''} en ${selectedPeriods.length} mes${selectedPeriods.length !== 1 ? 'es' : ''}.`}
+            />
+        </>
     )
 }

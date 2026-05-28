@@ -1,11 +1,10 @@
-import { useState } from 'react';
-import { Modal } from '../ui/Modal';
-import { Button } from '../ui/Button';
-import { loansApi } from '../../api/loans.api';
-import { useAuthStore } from '../../store/auth.store';
-import type { Game } from '../../types';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCheck} from "@fortawesome/free-solid-svg-icons";
+import { useState } from 'react'
+import { Modal } from '../ui/Modal'
+import { Button } from '../ui/Button'
+import { SuccessModal } from '../ui/SuccessModal'
+import { loansApi } from '../../api/loans.api'
+import { useAuthStore } from '../../store/auth.store'
+import type { Game } from '../../types'
 
 interface LoanRequestModalProps {
     game: Game | null
@@ -22,8 +21,15 @@ export function LoanRequestModal({ game, open, onClose, onSuccess }: LoanRequest
     const [success, setSuccess] = useState(false)
 
     const authUser = useAuthStore((state) => state.user)
-
     const today = new Date().toISOString().split('T')[0]
+
+    function handleClose() {
+        setSuccess(false)
+        setStartDate('')
+        setEndDate('')
+        setError('')
+        onClose()
+    }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -39,8 +45,6 @@ export function LoanRequestModal({ game, open, onClose, onSuccess }: LoanRequest
                 endDate,
             })
             setSuccess(true)
-            setStartDate('')
-            setEndDate('')
         } catch (err: any) {
             setError(err.response?.data?.message ?? 'Error al solicitar el préstamo.')
         } finally {
@@ -67,23 +71,8 @@ export function LoanRequestModal({ game, open, onClose, onSuccess }: LoanRequest
     }
 
     return (
-        <Modal open={open} onClose={onClose} title={`Solicitar préstamo: ${game?.name}`}>
-            {success ? (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', padding: '8px 0' }}>
-                    <div style={{
-                        width: '56px', height: '56px', borderRadius: '50%',
-                        background: '#d1fae5', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                        <FontAwesomeIcon icon={faCheck} style={{ color: '#065f46', width: '24px', height: '24px' }} />
-                    </div>
-                    <p style={{ textAlign: 'center', fontWeight: 600, color: 'var(--text-primary)' }}>
-                        ¡Préstamo solicitado correctamente!
-                    </p>
-                    <Button variant="primary" onClick={() => { onClose(); onSuccess(); setSuccess(false); setStartDate(''); setEndDate('') }}>
-                        Cerrar
-                    </Button>
-                </div>
-            ) : (
+        <>
+            <Modal open={open && !success} onClose={handleClose} title={`Solicitar préstamo: ${game?.name}`}>
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <div>
                         <label style={labelStyle}>Fecha de inicio</label>
@@ -108,16 +97,31 @@ export function LoanRequestModal({ game, open, onClose, onSuccess }: LoanRequest
                         />
                     </div>
 
-                    {error && <p style={{ fontSize: '0.8rem', color: 'var(--color-error)' }}>{error}</p>}
+                    {error && (
+                        <div style={{
+                            fontSize: '0.85rem', color: '#991b1b',
+                            background: '#fee2e2', border: '1px solid #fca5a5',
+                            padding: '10px 14px', borderRadius: '8px', textAlign: 'center',
+                        }}>
+                            {error}
+                        </div>
+                    )}
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                        <Button variant="secondary" type="button" onClick={onClose}>Cancelar</Button>
+                        <Button variant="secondary" type="button" onClick={handleClose}>Cancelar</Button>
                         <Button variant="primary" type="submit" disabled={loading}>
                             {loading ? 'Solicitando...' : 'Solicitar préstamo'}
                         </Button>
                     </div>
                 </form>
-            )}
-        </Modal>
+            </Modal>
+
+            <SuccessModal
+                open={success}
+                onClose={() => { onSuccess(); handleClose() }}
+                title="¡Préstamo solicitado correctamente!"
+                message="El bibliotecario revisará tu solicitud pronto."
+            />
+        </>
     )
 }

@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons'
 import type { PaymentDto } from '../../types'
 import {PaymentDetailModal} from "../../components/payments/PaymentDetalModal.tsx"
+import {SuccessModal} from "../../components/ui/SuccessModal.tsx";
 
 const STATUS_BADGE: Record<string, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'neutral' }> = {
     IN_REVIEW: { label: 'En revisión', variant: 'info' },
@@ -20,6 +21,8 @@ export default function PaymentsReviewPage() {
     const [page, setPage] = useState(1)
     const [selectedPayment, setSelectedPayment] = useState<PaymentDto | null>(null)
     const [detailOpen, setDetailOpen] = useState(false)
+    const [success, setSuccess] = useState(false)
+    const [successMessage, setSuccessMessage] = useState({ title: '', message: '' })
 
     const [filterStatus, setFilterStatus] = useState('IN_REVIEW')
     const [filterReference, setFilterReference] = useState('')
@@ -42,15 +45,25 @@ export default function PaymentsReviewPage() {
         loadPayments()
     }, [page, filterStatus, filterReference])
 
-    async function handleAccept(id: number) {
+    async function handleAccept(p: PaymentDto) {
         if (!window.confirm('¿Seguro que quieres aprobar este pago?')) return
-        await paymentsApi.accept(id)
+        await paymentsApi.accept(p.id)
+        setSuccessMessage({
+            title: '¡Pago aprobado correctamente!',
+            message: `El pago de ${p.amount.toFixed(2)} € ha sido aprobado. Las cuotas quedan marcadas como pagadas.`,
+        })
+        setSuccess(true)
         loadPayments()
     }
 
-    async function handleDeny(id: number) {
+    async function handleDeny(p: PaymentDto) {
         if (!window.confirm('¿Seguro que quieres denegar este pago?')) return
-        await paymentsApi.deny(id)
+        await paymentsApi.deny(p.id)
+        setSuccessMessage({
+            title: '¡Pago denegado!',
+            message: `El pago de ${p.amount.toFixed(2)} € ha sido denegado. Las cuotas vuelven al estado pendiente.`,
+        })
+        setSuccess(true)
         loadPayments()
     }
 
@@ -73,7 +86,7 @@ export default function PaymentsReviewPage() {
                     {p.status === 'IN_REVIEW' && (
                         <>
                             <button
-                                onClick={() => handleAccept(p.id)}
+                                onClick={() => handleAccept(p)}
                                 title="Aprobar"
                                 style={{
                                     background: 'none',
@@ -86,7 +99,7 @@ export default function PaymentsReviewPage() {
                                 <FontAwesomeIcon icon={faCheck} />
                             </button>
                             <button
-                                onClick={() => handleDeny(p.id)}
+                                onClick={() => handleDeny(p)}
                                 title="Denegar"
                                 style={{
                                     background: 'none',
@@ -152,6 +165,13 @@ export default function PaymentsReviewPage() {
                 open={detailOpen}
                 onClose={() => setDetailOpen(false)}
                 onSuccess={loadPayments}
+            />
+
+            <SuccessModal
+                open={success}
+                onClose={() => setSuccess(false)}
+                title={successMessage.title}
+                message={successMessage.message}
             />
         </div>
 

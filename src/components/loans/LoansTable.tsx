@@ -3,15 +3,16 @@ import { loansApi } from '../../api/loans.api';
 import { Table } from '../ui/Table';
 import { Pagination } from '../ui/Pagination';
 import { Badge } from '../ui/Badge';
+import { ConfirmModal } from '../ui/ConfirmModal';
 import type { LoanDto, LoanStatus } from '../../types';
-import {useAuthStore} from "../../store/auth.store.ts";
+import { useAuthStore } from '../../store/auth.store';
 
 const STATUS_BADGE: Record<LoanStatus, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'neutral' }> = {
-    PENDING:  { label: 'Pendiente', variant: 'warning' },
-    ACTIVE:   { label: 'Activo',    variant: 'success' },
-    RETURNED: { label: 'Devuelto',  variant: 'neutral' },
-    OVERDUE:  { label: 'Vencido',   variant: 'danger' },
-    CANCELLED:  { label: 'Cancelado',   variant: 'danger' },
+    PENDING:   { label: 'Pendiente',  variant: 'warning' },
+    ACTIVE:    { label: 'Activo',     variant: 'success' },
+    RETURNED:  { label: 'Devuelto',   variant: 'neutral' },
+    OVERDUE:   { label: 'Vencido',    variant: 'danger' },
+    CANCELLED: { label: 'Cancelado',  variant: 'danger' },
 }
 
 interface LoansTableProps {
@@ -31,6 +32,11 @@ export function LoansTable({ userId, showUserColumn = true, showActions = false 
     const [filterStartDate, setFilterStartDate] = useState('')
     const [filterEndDate, setFilterEndDate] = useState('')
     const [filterStatus, setFilterStatus] = useState('')
+    const [confirmOpen, setConfirmOpen] = useState(false)
+    const [confirmAction, setConfirmAction] = useState<LoanStatus | null>(null)
+    const [selectedLoan, setSelectedLoan] = useState<LoanDto | null>(null)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
 
     const limit = 10
 
@@ -54,14 +60,24 @@ export function LoansTable({ userId, showUserColumn = true, showActions = false 
         loadLoans()
     }, [page, filterStatus, filterStartDate, filterEndDate])
 
-    async function handleStatusChange(id: number, status: LoanStatus) {
-        if (!authUser) return
-        if (!window.confirm(`¿Seguro que quieres cambiar el estado a ${STATUS_BADGE[status].label}?`)) return
+    function openConfirm(loan: LoanDto, status: LoanStatus) {
+        setSelectedLoan(loan)
+        setConfirmAction(status)
+        setConfirmOpen(true)
+    }
+
+    async function handleConfirm() {
+        if (!authUser || !selectedLoan || !confirmAction) return
+        setError('')
+        setLoading(true)
         try {
-            await loansApi.updateStatus(id, status, authUser.id)
+            await loansApi.updateStatus(selectedLoan.id, confirmAction, authUser.id)
+            setConfirmOpen(false)
             loadLoans()
         } catch (err: any) {
-            alert(err.response?.data?.message ?? 'Error al actualizar el estado.')
+            setError(err.response?.data?.message ?? 'Error al actualizar el estado.')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -72,6 +88,14 @@ export function LoansTable({ userId, showUserColumn = true, showActions = false 
         fontSize: '0.875rem',
         outline: 'none',
     }
+
+    const confirmMessages: Record<string, { title: string; message: string; label: string; variant: 'primary' | 'danger' }> = {
+        ACTIVE:    { title: 'Activar préstamo',   message: `¿Has retirado "${selectedLoan?.gameName}" de la biblioteca? El préstamo pasará a estado Activo.`,  label: 'Activar',   variant: 'primary' },
+        RETURNED:  { title: 'Devolver préstamo',  message: `¿Confirmas que has devuelto "${selectedLoan?.gameName}"? El préstamo pasará a estado Devuelto.`,    label: 'Devolver',  variant: 'primary' },
+        CANCELLED: { title: 'Cancelar préstamo',  message: `¿Seguro que quieres cancelar el préstamo de "${selectedLoan?.gameName}"?`,                          label: 'Cancelar',  variant: 'danger'  },
+    }
+
+    const confirm = confirmAction ? confirmMessages[confirmAction] : null
 
     const columns = [
         ...(showUserColumn ? [{ label: 'Socio', render: (l: LoanDto) => l.userName }] : []),
@@ -92,18 +116,18 @@ export function LoansTable({ userId, showUserColumn = true, showActions = false 
                 <div style={{ display: 'flex', gap: '6px' }} onClick={(e) => e.stopPropagation()}>
                     {l.status === 'PENDING' && (
                         <>
-                            <button onClick={() => handleStatusChange(l.id, 'ACTIVE')}
+                            <button onClick={() => openConfirm(l, 'ACTIVE')}
                                     style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-success)', fontWeight: 600 }}>
                                 Activar
                             </button>
-                            <button onClick={() => handleStatusChange(l.id, 'CANCELLED')}
-                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-error)', fontWeight: 600 }}>
+                            <button onClick={() => openConfirm(l, 'CANCELLED')}
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-error)', fontWeight: 600 }}>
                                 Cancelar
                             </button>
                         </>
                     )}
                     {(l.status === 'ACTIVE' || l.status === 'OVERDUE') && (
-                        <button onClick={() => handleStatusChange(l.id, 'RETURNED')}
+                        <button onClick={() => openConfirm(l, 'RETURNED')}
                                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-primary)', fontWeight: 600 }}>
                             Devuelto
                         </button>
@@ -136,12 +160,26 @@ export function LoansTable({ userId, showUserColumn = true, showActions = false 
                     <option value="ACTIVE">Activo</option>
                     <option value="RETURNED">Devuelto</option>
                     <option value="OVERDUE">Vencido</option>
+                    <option value="CANCELLED">Cancelado</option>
                 </select>
             </div>
 
             <Table columns={columns} data={loans} keyExtractor={(l) => l.id} />
 
             <Pagination page={page} totalPages={Math.ceil(total / limit)} onPageChange={setPage} />
+
+            {confirm && (
+                <ConfirmModal
+                    open={confirmOpen}
+                    onClose={() => { setConfirmOpen(false); setError('') }}
+                    onConfirm={handleConfirm}
+                    title={confirm.title}
+                    message={error || confirm.message}
+                    confirmLabel={confirm.label}
+                    confirmVariant={confirm.variant}
+                    loading={loading}
+                />
+            )}
         </div>
     )
 }

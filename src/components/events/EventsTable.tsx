@@ -10,6 +10,7 @@ import { useAuthStore } from '../../store/auth.store';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
 import type { EventDto, EventStatus } from '../../types';
+import {ConfirmModal} from "../ui/ConfirmModal.tsx";
 
 const STATUS_BADGE: Record<EventStatus, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'neutral' }> = {
     OPEN:      { label: 'Abierto',    variant: 'success' },
@@ -35,6 +36,10 @@ export function EventsTable({ onlyMine = false, initialDateTo, initialDateFrom }
     const [detailOpen, setDetailOpen] = useState(false)
     const [formOpen, setFormOpen] = useState(false)
     const [editEvent, setEditEvent] = useState<EventDto | null>(null)
+    const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
+    const [eventToDelete, setEventToDelete] = useState<EventDto | null>(null)
+    const [deleteLoading, setDeleteLoading] = useState(false)
+
     const limit = 10
 
     const authUser = useAuthStore((state) => state.user)
@@ -69,11 +74,22 @@ export function EventsTable({ onlyMine = false, initialDateTo, initialDateFrom }
         loadEvents()
     }
 
-    async function handleDelete(event: EventDto) {
-        if (!authUser) return
-        if (!window.confirm('¿Seguro que quieres eliminar este evento?')) return
-        await eventsApi.delete(event.id, authUser.id)
-        loadEvents()
+    function openDelete(event: EventDto) {
+        setEventToDelete(event)
+        setConfirmDeleteOpen(true)
+    }
+
+    async function handleDelete() {
+        if (!authUser || !eventToDelete) return
+        setDeleteLoading(true)
+        try {
+            await eventsApi.delete(eventToDelete.id, authUser.id)
+            setConfirmDeleteOpen(false)
+            setEventToDelete(null)
+            loadEvents()
+        } finally {
+            setDeleteLoading(false)
+        }
     }
 
     const inputStyle: React.CSSProperties = {
@@ -120,7 +136,7 @@ export function EventsTable({ onlyMine = false, initialDateTo, initialDateFrom }
                                     <FontAwesomeIcon icon={faPencil} />
                                 </button>
                                 <button
-                                    onClick={() => handleDelete(e)}
+                                    onClick={() => openDelete(e)}
                                     style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-error)', padding: '4px' }}
                                 >
                                     <FontAwesomeIcon icon={faTrash} />
@@ -208,6 +224,17 @@ export function EventsTable({ onlyMine = false, initialDateTo, initialDateFrom }
                 onClose={() => { setFormOpen(false); setEditEvent(null) }}
                 onSave={() => { loadEvents(); setFormOpen(false); setEditEvent(null) }}
                 event={editEvent}
+            />
+
+            <ConfirmModal
+                open={confirmDeleteOpen}
+                onClose={() => { setConfirmDeleteOpen(false); setEventToDelete(null) }}
+                onConfirm={handleDelete}
+                title="Eliminar evento"
+                message={`¿Seguro que quieres eliminar el evento "${eventToDelete?.title}"? Esta acción no se puede deshacer.`}
+                confirmLabel="Eliminar"
+                confirmVariant="danger"
+                loading={deleteLoading}
             />
         </div>
     )

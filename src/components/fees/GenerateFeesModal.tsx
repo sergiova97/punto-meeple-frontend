@@ -86,7 +86,7 @@ export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModa
         setLoading(true)
 
         try {
-            const result = await membershipFeesApi.generateFees({
+            await membershipFeesApi.generateFees({
                 userIds: selectedUserIds,
                 periods: selectedPeriods,
                 price: +price,

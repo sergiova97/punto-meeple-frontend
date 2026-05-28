@@ -4,6 +4,8 @@ import type {User} from "../../types";
 import {usersApi} from "../../api/users.api.ts";
 import {membershipFeesApi} from "../../api/membership-fees.api.ts";
 import {Button} from "../ui/Button.tsx";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCheck} from "@fortawesome/free-solid-svg-icons";
 
 interface GenerateFeesModalProps {
     open: boolean
@@ -25,6 +27,9 @@ export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModa
     const [price, setPrice] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+
+    const [success, setSuccess] = useState(false)
+    const [generatedCount, setGeneratedCount] = useState(0)
 
     const allMonths = getAllMonths()
 
@@ -83,18 +88,24 @@ export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModa
         setLoading(true)
 
         try {
-            await membershipFeesApi.generateFees({
+            const result = await membershipFeesApi.generateFees({
                 userIds: selectedUserIds,
                 periods: selectedPeriods,
                 price: +price,
             })
-            onSuccess()
-            onClose()
+            setGeneratedCount(result.created)
+            setSuccess(true)
         } catch (err: any) {
             setError(err.response?.data?.message ?? 'Error al generar las cuotas.')
         } finally {
             setLoading(false)
         }
+    }
+
+    function handleClose() {
+        setSuccess(false)
+        setGeneratedCount(0)
+        onClose()
     }
 
     const inputStyle: React.CSSProperties = {
@@ -111,121 +122,141 @@ export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModa
 
     return (
         <Modal open={open} onClose={onClose} title="Generar cuotas" width={520}>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', display: 'block' }}>
-                        Precio por cuota (€)
-                    </label>
-                    <input
-                        style={inputStyle}
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={price}
-                        onChange={(e) => setPrice(e.target.value)}
-                        placeholder="Ej: 10.00"
-                        required
-                    />
-                </div>
-
-                <div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                        <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                            Meses ({selectedPeriods.length}/{allMonths.length} seleccionados)
-                        </label>
-                        <button
-                            type="button"
-                            onClick={toggleAllPeriods}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 600 }}
-                        >
-                            {allPeriodsSelected ? 'Deseleccionar todos' : 'Seleccionar todos'}
-                        </button>
-                    </div>
+            {success ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', padding: '8px 0' }}>
                     <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(3, 1fr)',
-                        gap: '4px',
-                        border: '1px solid var(--border)',
-                        borderRadius: '6px',
-                        padding: '8px',
+                        width: '56px', height: '56px', borderRadius: '50%',
+                        background: '#d1fae5', display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                        {allMonths.map((period, index) => (
-                            <label
-                                key={period}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    padding: '6px 8px',
-                                    cursor: 'pointer',
-                                    borderRadius: '4px',
-                                    fontSize: '0.875rem',
-                                }}
-                            >
-                                <input
-                                    type="checkbox"
-                                    checked={selectedPeriods.includes(period)}
-                                    onChange={() => togglePeriod(period)}
-                                />
-                                {MONTH_NAMES[index]}
-                            </label>
-                        ))}
+                        <FontAwesomeIcon icon={faCheck} style={{ color: '#065f46', width: '24px', height: '24px' }} />
                     </div>
-                </div>
-
-                <div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                        <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                            Socios ({selectedUserIds.length}/{users.length} seleccionados)
-                        </label>
-                        <button
-                            type="button"
-                            onClick={toggleAll}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 600 }}
-                        >
-                            {allSelected ? 'Deseleccionar todos' : 'Seleccionar todos'}
-                        </button>
-                    </div>
-                    <div style={{
-                        maxHeight: '200px',
-                        overflowY: 'auto',
-                        border: '1px solid var(--border)',
-                        borderRadius: '6px',
-                        padding: '4px',
-                    }}>
-                        {users.map((user) => (
-                            <label
-                                key={user.id}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '10px',
-                                    padding: '8px 12px',
-                                    cursor: 'pointer',
-                                    borderRadius: '4px',
-                                    fontSize: '0.875rem',
-                                }}
-                            >
-                                <input
-                                    type="checkbox"
-                                    checked={selectedUserIds.includes(user.id)}
-                                    onChange={() => toggleUser(user.id)}
-                                />
-                                {user.surname}, {user.name}
-                            </label>
-                        ))}
-                    </div>
-                </div>
-
-                {error && <p style={{ fontSize: '0.8rem', color: 'var(--color-error)' }}>{error}</p>}
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '8px' }}>
-                    <Button variant="secondary" type="button" onClick={onClose}>Cancelar</Button>
-                    <Button variant="primary" type="submit" disabled={loading}>
-                        {loading ? 'Generando...' : 'Generar cuotas'}
+                    <p style={{ textAlign: 'center', fontWeight: 600, color: 'var(--text-primary)' }}>
+                        ¡Cuotas generadas correctamente!
+                    </p>
+                    <p style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                        Se han generado {generatedCount} cuota{generatedCount !== 1 ? 's' : ''} correctamente.
+                    </p>
+                    <Button variant="primary" onClick={() => { onSuccess(); handleClose() }}>
+                        Cerrar
                     </Button>
                 </div>
-            </form>
+            ) : (
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div>
+                        <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', display: 'block' }}>
+                            Precio por cuota (€)
+                        </label>
+                        <input
+                            style={inputStyle}
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            placeholder="Ej: 10.00"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                Meses ({selectedPeriods.length}/{allMonths.length} seleccionados)
+                            </label>
+                            <button
+                                type="button"
+                                onClick={toggleAllPeriods}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 600 }}
+                            >
+                                {allPeriodsSelected ? 'Deseleccionar todos' : 'Seleccionar todos'}
+                            </button>
+                        </div>
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(3, 1fr)',
+                            gap: '4px',
+                            border: '1px solid var(--border)',
+                            borderRadius: '6px',
+                            padding: '8px',
+                        }}>
+                            {allMonths.map((period, index) => (
+                                <label
+                                    key={period}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        padding: '6px 8px',
+                                        cursor: 'pointer',
+                                        borderRadius: '4px',
+                                        fontSize: '0.875rem',
+                                    }}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedPeriods.includes(period)}
+                                        onChange={() => togglePeriod(period)}
+                                    />
+                                    {MONTH_NAMES[index]}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                Socios ({selectedUserIds.length}/{users.length} seleccionados)
+                            </label>
+                            <button
+                                type="button"
+                                onClick={toggleAll}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 600 }}
+                            >
+                                {allSelected ? 'Deseleccionar todos' : 'Seleccionar todos'}
+                            </button>
+                        </div>
+                        <div style={{
+                            maxHeight: '200px',
+                            overflowY: 'auto',
+                            border: '1px solid var(--border)',
+                            borderRadius: '6px',
+                            padding: '4px',
+                        }}>
+                            {users.map((user) => (
+                                <label
+                                    key={user.id}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '10px',
+                                        padding: '8px 12px',
+                                        cursor: 'pointer',
+                                        borderRadius: '4px',
+                                        fontSize: '0.875rem',
+                                    }}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedUserIds.includes(user.id)}
+                                        onChange={() => toggleUser(user.id)}
+                                    />
+                                    {user.surname}, {user.name}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    {error && <p style={{ fontSize: '0.8rem', color: 'var(--color-error)' }}>{error}</p>}
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '8px' }}>
+                        <Button variant="secondary" type="button" onClick={onClose}>Cancelar</Button>
+                        <Button variant="primary" type="submit" disabled={loading}>
+                            {loading ? 'Generando...' : 'Generar cuotas'}
+                        </Button>
+                    </div>
+                </form>
+            )}
         </Modal>
     )
 }

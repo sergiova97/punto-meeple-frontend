@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
-import { Modal } from '../ui/Modal.tsx'
-import { Button } from '../ui/Button.tsx'
-import { usersApi } from '../../api/users.api.ts'
-import { membershipFeesApi } from '../../api/membership-fees.api.ts'
-import type { User } from '../../types'
+import {Modal} from "../ui/Modal.tsx";
+import {useEffect, useState} from "react";
+import type {User} from "../../types";
+import {usersApi} from "../../api/users.api.ts";
+import {membershipFeesApi} from "../../api/membership-fees.api.ts";
+import {Button} from "../ui/Button.tsx";
 
 interface GenerateFeesModalProps {
     open: boolean
@@ -11,30 +11,30 @@ interface GenerateFeesModalProps {
     onSuccess: () => void
 }
 
-function getRemainingMonths(): string[] {
-    const now = new Date()
-    const year = now.getFullYear()
-    const currentMonth = now.getMonth() + 1
-    const months = []
+const MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 
-    for (let m = currentMonth; m <= 12; m++) {
-        const month = m.toString().padStart(2, '0')
-        months.push(`${year}-${month}`)
-    }
-
-    return months
+function getAllMonths(): string[] {
+    const year = new Date().getFullYear()
+    return Array.from({ length: 12 }, (_, i) => `${year}-${String(i + 1).padStart(2, '0')}`)
 }
 
 export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModalProps) {
     const [users, setUsers] = useState<User[]>([])
     const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
+    const [selectedPeriods, setSelectedPeriods] = useState<string[]>([])
     const [price, setPrice] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
+    const allMonths = getAllMonths()
+
     useEffect(() => {
         if (open) {
             usersApi.getAll(1, 10, true).then((res) => setUsers(res.data))
+            setSelectedPeriods([])
+            setSelectedUserIds([])
+            setPrice('')
+            setError('')
         }
     }, [open])
 
@@ -52,6 +52,20 @@ export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModa
         }
     }
 
+    function togglePeriod(period: string) {
+        setSelectedPeriods((prev) =>
+            prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period],
+        )
+    }
+
+    function toggleAllPeriods() {
+        if (selectedPeriods.length === allMonths.length) {
+            setSelectedPeriods([])
+        } else {
+            setSelectedPeriods(allMonths)
+        }
+    }
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
         setError('')
@@ -61,13 +75,17 @@ export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModa
             return
         }
 
+        if (selectedPeriods.length === 0) {
+            setError('Selecciona al menos un mes.')
+            return
+        }
+
         setLoading(true)
 
         try {
-            const periods = getRemainingMonths()
             await membershipFeesApi.generateFees({
                 userIds: selectedUserIds,
-                periods,
+                periods: selectedPeriods,
                 price: +price,
             })
             onSuccess()
@@ -89,6 +107,7 @@ export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModa
     }
 
     const allSelected = selectedUserIds.length === users.length
+    const allPeriodsSelected = selectedPeriods.length === allMonths.length
 
     return (
         <Modal open={open} onClose={onClose} title="Generar cuotas" width={520}>
@@ -110,24 +129,46 @@ export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModa
                 </div>
 
                 <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px', display: 'block' }}>
-                        Periodos a generar
-                    </label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                        {getRemainingMonths().map((m) => (
-                            <span
-                                key={m}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                            Meses ({selectedPeriods.length}/{allMonths.length} seleccionados)
+                        </label>
+                        <button
+                            type="button"
+                            onClick={toggleAllPeriods}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 600 }}
+                        >
+                            {allPeriodsSelected ? 'Deseleccionar todos' : 'Seleccionar todos'}
+                        </button>
+                    </div>
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(3, 1fr)',
+                        gap: '4px',
+                        border: '1px solid var(--border)',
+                        borderRadius: '6px',
+                        padding: '8px',
+                    }}>
+                        {allMonths.map((period, index) => (
+                            <label
+                                key={period}
                                 style={{
-                                    padding: '2px 8px',
-                                    borderRadius: '99px',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 600,
-                                    background: 'var(--color-secondary)',
-                                    color: 'var(--color-primary)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    padding: '6px 8px',
+                                    cursor: 'pointer',
+                                    borderRadius: '4px',
+                                    fontSize: '0.875rem',
                                 }}
                             >
-                                {m}
-                            </span>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedPeriods.includes(period)}
+                                    onChange={() => togglePeriod(period)}
+                                />
+                                {MONTH_NAMES[index]}
+                            </label>
                         ))}
                     </div>
                 </div>
@@ -140,19 +181,11 @@ export function GenerateFeesModal({ open, onClose, onSuccess }: GenerateFeesModa
                         <button
                             type="button"
                             onClick={toggleAll}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                fontSize: '0.8rem',
-                                color: 'var(--color-primary)',
-                                fontWeight: 600,
-                            }}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 600 }}
                         >
                             {allSelected ? 'Deseleccionar todos' : 'Seleccionar todos'}
                         </button>
                     </div>
-
                     <div style={{
                         maxHeight: '200px',
                         overflowY: 'auto',
